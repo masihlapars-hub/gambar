@@ -1,20 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Game Tebak Gambar</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary:#3498db; --secondary:#2ecc71; --accent:#e74c3c;
-      --text:#2c3e50; --background:#f8f9fa; --card-bg:#ffffff; --border:#ddd;
-    }
-    .dark-theme{
-      --primary:#2980b9; --secondary:#27ae60; --accent:#c0392b;
-      --text:#ecf0f1; --background:#1a1a2e; --card-bg:#16213e; --border:#34495e;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;transition:background-color .3s,color .3s}
+    :root { --primary:#3498db; --secondary:#2ecc71; --accent:#e74c3c; --text:#2c3e50; --background:#f8f9fa; --card-bg:#ffffff; --border:#ddd; }
+    .dark-theme{ --primary:#2980b9; --secondary:#27ae60; --accent:#c0392b; --text:#ecf0f1; --background:#1a1a2e; --card-bg:#16213e; --border:#34495e; }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;transition:background-color .3s,color .3s}
     body{background-color:var(--background);color:var(--text);min-height:100vh;padding:20px}
     .container{max-width:1200px;margin:0 auto}
     header{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:2px solid var(--primary);margin-bottom:30px}
@@ -39,10 +33,12 @@
     .login-form h2,.level-select h2,.game-container h2{margin-bottom:20px;color:var(--primary);text-align:center}
     .form-group{margin-bottom:20px}
     .form-group label{display:block;margin-bottom:8px;font-weight:500}
-    .form-group input{width:100%;padding:12px 15px;border:2px solid var(--border);border-radius:8px;font-size:1rem;background-color:var(--background);color:var(--text)}
+    .form-group input,.form-group select{width:100%;padding:12px 15px;border:2px solid var(--border);border-radius:8px;font-size:1rem;background-color:var(--background);color:var(--text)}
     .btn{padding:12px 25px;border:none;border-radius:30px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s}
     .btn-primary{background-color:var(--primary);color:#fff}
     .btn-primary:hover{background-color:var(--secondary)}
+    .btn-secondary{background-color:var(--background);color:var(--text);border:2px solid var(--border)}
+    .btn-secondary:hover{background-color:var(--border)}
     .btn-block{display:block;width:100%}
     .levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:15px;margin-top:30px}
     .level-btn{aspect-ratio:1;border-radius:10px;border:2px solid var(--border);background-color:var(--background);color:var(--text);font-size:1.2rem;font-weight:bold;cursor:pointer;transition:all .3s}
@@ -59,11 +55,16 @@
     .option-btn.incorrect{border-color:var(--accent);background-color:rgba(231,76,60,.2)}
     .game-feedback{text-align:center;font-size:1.2rem;font-weight:bold;margin-bottom:20px;min-height:40px}
     .correct-feedback{color:var(--secondary)} .incorrect-feedback{color:var(--accent)}
-    .game-controls{display:flex;justify-content:center;gap:15px}
-    .btn-secondary{background-color:var(--background);color:var(--text);border:2px solid var(--border)}
-    .btn-secondary:hover{background-color:var(--border)}
+    .game-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
     footer{text-align:center;margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--text);font-size:.9rem}
-    @media (max-width:768px){.main-content{grid-template-columns:1fr}.game-options{grid-template-columns:1fr}nav ul{flex-wrap:wrap;justify-content:center}}
+    .admin-box{max-width:720px;margin:0 auto;display:grid;gap:14px}
+    .admin-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .admin-list{margin-top:16px;border-top:1px dashed var(--border);padding-top:12px}
+    .thumb{width:80px;height:60px;object-fit:cover;border:1px solid var(--border);border-radius:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+    th{background:var(--background)}
+    @media (max-width:768px){.main-content{grid-template-columns:1fr}.game-options{grid-template-columns:1fr}nav ul{flex-wrap:wrap;justify-content:center}.admin-row{grid-template-columns:1fr}}
   </style>
 </head>
 <body class="light-theme">
@@ -84,9 +85,7 @@
     <div class="main-content">
       <aside class="sidebar">
         <div class="user-info">
-          <div class="avatar">
-            <img src="static/avatar/domba.jpg" alt="Avatar" id="user-avatar">
-          </div>
+          <div class="avatar"><img src="static/avatar/domba.jpg" alt="Avatar" id="user-avatar"></div>
           <div class="username" id="username">Guest</div>
           <div class="user-score">Skor: <span id="user-score">0</span></div>
         </div>
@@ -107,7 +106,7 @@
       </aside>
 
       <main class="content">
-        <!-- Halaman Login -->
+        <!-- HALAMAN HOME -->
         <div class="page active" id="home">
           <div class="login-form">
             <h2>Login Pemain</h2>
@@ -134,7 +133,7 @@
           </div>
         </div>
 
-        <!-- Halaman Level -->
+        <!-- HALAMAN LEVEL -->
         <div class="page" id="levels">
           <div class="level-select">
             <h2>Pilih Level</h2>
@@ -142,7 +141,7 @@
           </div>
         </div>
 
-        <!-- Halaman Game -->
+        <!-- HALAMAN GAME -->
         <div class="page" id="game">
           <div class="game-container">
             <div class="game-header">
@@ -150,47 +149,114 @@
               <div class="score-info">Skor: <span id="current-score">0</span></div>
             </div>
 
-            <div class="game-image">
-              <img id="game-img" src="" alt="Gambar tebakan">
-            </div>
+            <div class="game-image"><img id="game-img" src="" alt="Gambar tebakan"></div>
 
+            <!-- Kontainer opsi / input -->
             <div class="game-options" id="options-container"></div>
 
             <div class="game-feedback" id="feedback"></div>
 
             <div class="game-controls">
               <button class="btn btn-secondary" id="hint-btn">Bantuan</button>
+              <button class="btn btn-secondary" id="save-score-btn">Simpan Skor</button>
               <button class="btn btn-primary" id="next-btn" style="display:none;">Lanjut</button>
             </div>
           </div>
         </div>
 
-        <!-- Halaman Top Score -->
+        <!-- HALAMAN TOP SCORE -->
         <div class="page" id="top-score">
           <h2>Top Score</h2>
           <div id="scoreboard"></div>
         </div>
 
-        <!-- Halaman Admin -->
+        <!-- HALAMAN ADMIN -->
         <div class="page" id="admin">
           <h2>Panel Admin</h2>
-          <p>Fitur admin akan ditambahkan kemudian.</p>
+          <div id="admin-locked" class="admin-box">
+            <p>Masukkan password admin untuk mengelola soal.</p>
+            <div class="admin-row">
+              <input id="admin-pass" type="password" placeholder="Password admin">
+              <button class="btn btn-primary" id="admin-login-btn">Login</button>
+            </div>
+            <small>Hint: 6 digit 😊</small>
+          </div>
+
+          <div id="admin-panel" class="admin-box" style="display:none">
+            <div class="admin-row">
+              <div class="form-group">
+                <label>Level</label>
+                <input id="adm-level" type="number" min="1" max="100" value="1">
+              </div>
+              <div class="form-group">
+                <label>Mode Soal</label>
+                <select id="adm-mode">
+                  <option value="easy">Easy (isian)</option>
+                  <option value="mcq">MCQ (pilihan ganda)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Gambar Soal (upload)</label>
+              <input id="adm-image" type="file" accept="image/*">
+              <div style="margin-top:8px"><img id="adm-preview" class="thumb" alt="preview" /></div>
+            </div>
+
+            <div class="form-group">
+              <label>Jawaban Benar</label>
+              <input id="adm-correct" type="text" placeholder="contoh: Matahari">
+            </div>
+
+            <div id="adm-mcq" class="admin-row">
+              <div class="form-group"><label>Opsi Salah A</label><input id="adm-wa" type="text" placeholder="opsi salah A"></div>
+              <div class="form-group"><label>Opsi Salah B</label><input id="adm-wb" type="text" placeholder="opsi salah B"></div>
+              <div class="form-group"><label>Opsi Salah C</label><input id="adm-wc" type="text" placeholder="opsi salah C"></div>
+            </div>
+
+            <div class="admin-row">
+              <button class="btn btn-primary" id="adm-save">Simpan / Update Level</button>
+              <button class="btn btn-secondary" id="adm-delete">Hapus Custom Level</button>
+            </div>
+
+            <div class="admin-row">
+              <button class="btn btn-secondary" id="adm-reset-score">Reset Semua Skor</button>
+              <button class="btn btn-secondary" id="adm-reset-progress">Reset Progress Pemain</button>
+            </div>
+
+            <div class="admin-list" id="adm-list"></div>
+          </div>
         </div>
       </main>
     </div>
 
-    <footer>
-      <p>&copy; 2025 Game Tebak Gambar. All rights reserved.</p>
-    </footer>
+    <footer><p>&copy; 2025 Game Tebak Gambar. All rights reserved.</p></footer>
   </div>
 
   <script>
-    // =========================
-    // DATA LEVEL (pakai static/level)
-    // =========================
-    const gameData = [];
-    for (let i = 1; i <= 100; i++) {
+    // --------------------------
+    // KONST & UTIL
+    // --------------------------
+    const LS_KEYS = {
+      progress: 'tebakGambarProgress',
+      scores: 'tebakGambarScores',
+      custom: 'tebakGambarCustomLevels',
+      admin: 'tebakGambarAdminAuthed'
+    };
+    const ADMIN_PASSWORD = '281105';
+    const GLOBAL_DEFAULT_MODE = 'easy'; // default global: easy (isian)
+
+    function $(sel){ return document.querySelector(sel); }
+    function htmlescape(s){ return (s||'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    const norm = s => (s||'').toString().trim().toLowerCase();
+
+    // --------------------------
+    // DATA LEVEL DEFAULT (static/level)
+    // --------------------------
+    let gameData = [];
+    for(let i=1;i<=100;i++){
       gameData.push({
+        level: i,
         image: `static/level/level${i}.png`,
         correctAnswer: `Jawaban Level ${i}`,
         options: [
@@ -198,13 +264,14 @@
           `Opsi Salah A ${i}`,
           `Opsi Salah B ${i}`,
           `Opsi Salah C ${i}`
-        ]
+        ],
+        mode: GLOBAL_DEFAULT_MODE
       });
     }
 
-    // =========================
-    // TEMA
-    // =========================
+    // --------------------------
+    // THEME
+    // --------------------------
     const themes = {
       light1:{primary:"#3498db",secondary:"#2ecc71",accent:"#e74c3c",text:"#2c3e50",background:"#f8f9fa",cardBg:"#ffffff",border:"#ddd"},
       light2:{primary:"#9b59b6",secondary:"#1abc9c",accent:"#e67e22",text:"#34495e",background:"#ecf0f1",cardBg:"#ffffff",border:"#bdc3c7"},
@@ -216,237 +283,395 @@
       dark4:{primary:"#2c3e50",secondary:"#1abc9c",accent:"#e74c3c",text:"#ecf0f1",background:"#0c2461",cardBg:"#1e3799",border:"#4a69bd"}
     };
 
-    // =========================
+    // --------------------------
     // STATE
-    // =========================
-    let currentLevel = 1;
-    let score = 0;
-    let maxUnlockedLevel = 1;
-    let playerName = "Guest";
-    // default avatar pakai nama file tanpa ekstensi
-    let playerAvatar = "domba";
-    let currentTheme = "light1";
+    // --------------------------
+    let currentLevel = 1, score = 0, maxUnlockedLevel = 1;
+    let playerName = "Guest", playerAvatar = "domba", currentTheme = "light1";
 
-    // =========================
-    // DOM
-    // =========================
-    const usernameEl = document.getElementById('username');
-    const userScoreEl = document.getElementById('user-score');
-    const userAvatarEl = document.getElementById('user-avatar');
-    const playerNameInput = document.getElementById('player-name');
-    const startBtn = document.getElementById('start-btn');
-    const levelsGrid = document.getElementById('levels-grid');
-    const currentLevelEl = document.getElementById('current-level');
-    const currentScoreEl = document.getElementById('current-score');
-    const gameImg = document.getElementById('game-img');
-    const optionsContainer = document.getElementById('options-container');
-    const feedbackEl = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn');
-    const hintBtn = document.getElementById('hint-btn');
-    const logoutBtn = document.getElementById('logout-btn');
+    // DOM refs
+    const usernameEl = $('#username');
+    const userScoreEl = $('#user-score');
+    const userAvatarEl = $('#user-avatar');
+    const playerNameInput = $('#player-name');
+    const startBtn = $('#start-btn');
+    const levelsGrid = $('#levels-grid');
+    const currentLevelEl = $('#current-level');
+    const currentScoreEl = $('#current-score');
+    const gameImg = $('#game-img');
+    const optionsContainer = $('#options-container');
+    const feedbackEl = $('#feedback');
+    const nextBtn = $('#next-btn');
+    const hintBtn = $('#hint-btn');
+    const saveScoreBtn = $('#save-score-btn');
+    const logoutBtn = $('#logout-btn');
     const navLinks = document.querySelectorAll('.nav-link');
     const pages = document.querySelectorAll('.page');
     const themeBtns = document.querySelectorAll('.theme-btn');
     const avatarOptions = document.querySelectorAll('.avatar-option');
 
-    // =========================
+    // Admin DOM
+    const adminLocked = $('#admin-locked');
+    const adminPanel = $('#admin-panel');
+    const adminLoginBtn = $('#admin-login-btn');
+    const adminPass = $('#admin-pass');
+    const admLevel = $('#adm-level');
+    const admMode = $('#adm-mode');
+    const admImage = $('#adm-image');
+    const admPreview = $('#adm-preview');
+    const admCorrect = $('#adm-correct');
+    const admWA = $('#adm-wa');
+    const admWB = $('#adm-wb');
+    const admWC = $('#adm-wc');
+    const admSave = $('#adm-save');
+    const admDelete = $('#adm-delete');
+    const admResetScore = $('#adm-reset-score');
+    const admResetProgress = $('#adm-reset-progress');
+    const admList = $('#adm-list');
+    const admMCQWrap = $('#adm-mcq');
+
+    // --------------------------
     // INIT
-    // =========================
-    function initGame(){
+    // --------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCustomLevels();
       generateLevelButtons();
       loadGameProgress();
       updateUI();
-    }
+      renderScoreboard();
+      updateAdminGate();
+    });
 
-    // =========================
+    // --------------------------
     // LEVEL BUTTONS
-    // =========================
+    // --------------------------
     function generateLevelButtons(){
       levelsGrid.innerHTML = '';
       for(let i=1;i<=100;i++){
-        const levelBtn = document.createElement('button');
-        levelBtn.className = 'level-btn';
-        levelBtn.textContent = i;
-        levelBtn.dataset.level = i;
+        const b = document.createElement('button');
+        b.className = 'level-btn';
+        b.textContent = i;
+        b.dataset.level = i;
 
-        if(i === currentLevel) levelBtn.classList.add('current');
-        else if(i < currentLevel) levelBtn.classList.add('completed');
-        else if(i === maxUnlockedLevel) levelBtn.classList.add('unlocked');
+        if(i === currentLevel) b.classList.add('current');
+        else if(i < currentLevel) b.classList.add('completed');
+        else if(i === maxUnlockedLevel) b.classList.add('unlocked');
 
         if(i <= maxUnlockedLevel){
-          levelBtn.addEventListener('click',()=>selectLevel(i));
+          b.addEventListener('click',()=>selectLevel(i));
         }
-        levelsGrid.appendChild(levelBtn);
+        levelsGrid.appendChild(b);
       }
     }
+    function selectLevel(level){ currentLevel = level; showPage('game'); loadLevel(level); }
 
-    function selectLevel(level){
-      currentLevel = level;
-      showPage('game');
-      loadLevel(level);
+    // --------------------------
+    // LOAD LEVEL
+    // --------------------------
+    function getLevelData(level){
+      return gameData[level-1];
     }
-
     function loadLevel(level){
-      const levelData = gameData[level-1];
+      const d = getLevelData(level);
       currentLevelEl.textContent = level;
       currentScoreEl.textContent = score;
 
-      // pakai gambar dari static/level, fallback ke placeholder jika tidak ada
+      // gambar: pakai custom->dataURL jika ada; else pakai static/level/levelN.png; fallback placeholder
+      const fromCustom = (d.customImage && d.customImage.startsWith('data:'));
       gameImg.onerror = () => {
         gameImg.onerror = null;
         gameImg.src = `https://via.placeholder.com/500x300/3498db/ffffff?text=Level+${level}`;
       };
-      gameImg.src = levelData.image;
+      gameImg.src = (fromCustom ? d.customImage : (d.image + `?v=${Date.now()}`));
       gameImg.alt = `Gambar untuk level ${level}`;
 
-      const shuffledOptions = [...levelData.options].sort(()=>Math.random()-0.5);
+      // render soal: easy (isian) atau mcq (pilihan ganda)
       optionsContainer.innerHTML = '';
-      shuffledOptions.forEach(option=>{
-        const optionBtn = document.createElement('button');
-        optionBtn.className = 'option-btn';
-        optionBtn.textContent = option;
-        optionBtn.addEventListener('click',()=>checkAnswer(option, levelData.correctAnswer));
-        optionsContainer.appendChild(optionBtn);
-      });
+      if ((d.mode || GLOBAL_DEFAULT_MODE) === 'easy') {
+        renderEasy(d);
+      } else {
+        renderMCQ(d);
+      }
 
       feedbackEl.textContent = '';
       feedbackEl.className = 'game-feedback';
       nextBtn.style.display = 'none';
     }
 
+    function renderMCQ(d){
+      const shuffled = [...d.options];
+      shuffled.sort(()=>Math.random()-0.5);
+      optionsContainer.classList.add('game-options');
+      optionsContainer.innerHTML = '';
+      shuffled.forEach(opt=>{
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = ()=>checkAnswer(opt, d.correctAnswer);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function renderEasy(d){
+      optionsContainer.classList.remove('game-options');
+      optionsContainer.innerHTML = `
+        <div style="display:grid;gap:12px;max-width:520px;margin:0 auto;">
+          <input id="easy-input" type="text" placeholder="Ketik jawaban kamu…" 
+                 style="padding:12px 15px;border:2px solid var(--border);border-radius:10px;background:var(--background);color:var(--text);font-size:1rem;">
+          <button id="easy-submit" class="btn btn-primary">Cek Jawaban</button>
+        </div>`;
+      const input = $('#easy-input'); const submit = $('#easy-submit');
+      const go = ()=>checkTextAnswer(input.value, d.correctAnswer);
+      submit.onclick = go; input.onkeydown = e=>{if(e.key==='Enter') go();};
+    }
+
     function checkAnswer(selected, correct){
-      const btns = document.querySelectorAll('.option-btn');
-      btns.forEach(b=>{
+      document.querySelectorAll('.option-btn').forEach(b=>{
         b.disabled = true;
         if(b.textContent === correct) b.classList.add('correct');
         else if(b.textContent === selected && selected !== correct) b.classList.add('incorrect');
       });
+      postAnswer(selected === correct, correct);
+    }
 
-      if(selected === correct){
+    function checkTextAnswer(text, correct){
+      postAnswer(norm(text) === norm(correct), correct);
+    }
+
+    function postAnswer(ok, correct){
+      if(ok){
         feedbackEl.textContent = "Benar! 🎉";
+        feedbackEl.classList.remove('incorrect-feedback');
         feedbackEl.classList.add('correct-feedback');
         score += 10;
         userScoreEl.textContent = score;
         currentScoreEl.textContent = score;
-        if(currentLevel === maxUnlockedLevel){
-          maxUnlockedLevel = Math.min(maxUnlockedLevel + 1, 100);
-        }
+        if(currentLevel === maxUnlockedLevel){ maxUnlockedLevel = Math.min(maxUnlockedLevel+1, 100); }
         saveGameProgress();
       }else{
         feedbackEl.textContent = `Salah! Jawaban yang benar: ${correct}`;
+        feedbackEl.classList.remove('correct-feedback');
         feedbackEl.classList.add('incorrect-feedback');
       }
       nextBtn.style.display = 'block';
     }
 
-    // =========================
-    // STORAGE
-    // =========================
+    // --------------------------
+    // SCOREBOARD
+    // --------------------------
+    function getScores(){
+      try{ return JSON.parse(localStorage.getItem(LS_KEYS.scores) || '[]'); }catch{ return []; }
+    }
+    function setScores(arr){ localStorage.setItem(LS_KEYS.scores, JSON.stringify(arr)); }
+    function addScore(name, score, avatar){
+      const scores = getScores();
+      scores.push({name, score, avatar, date: new Date().toISOString()});
+      scores.sort((a,b)=> b.score - a.score);
+      setScores(scores.slice(0,50)); // simpan top 50
+      renderScoreboard();
+    }
+    function renderScoreboard(){
+      const scores = getScores();
+      const el = $('#scoreboard');
+      if(!scores.length){ el.innerHTML = '<p>Belum ada skor tersimpan.</p>'; return; }
+      const rows = scores.map((s,idx)=>`
+        <tr>
+          <td>${idx+1}</td>
+          <td><img src="static/avatar/${htmlescape(s.avatar||'domba')}.jpg" onerror="this.src='static/avatar/${htmlescape(s.avatar||'domba')}.png'" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px"> ${htmlescape(s.name)}</td>
+          <td>${s.score}</td>
+          <td>${new Date(s.date).toLocaleString()}</td>
+        </tr>`).join('');
+      el.innerHTML = `<table><thead><tr><th>#</th><th>Pemain</th><th>Skor</th><th>Waktu</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    // --------------------------
+    // STORAGE (PROGRESS)
+    // --------------------------
     function saveGameProgress(){
       const data = {playerName, playerAvatar, score, currentLevel, maxUnlockedLevel, currentTheme};
-      localStorage.setItem('tebakGambarProgress', JSON.stringify(data));
+      localStorage.setItem(LS_KEYS.progress, JSON.stringify(data));
     }
-
     function loadGameProgress(){
-      const saved = localStorage.getItem('tebakGambarProgress');
+      const saved = localStorage.getItem(LS_KEYS.progress);
       if(!saved) return;
-      const p = JSON.parse(saved);
-      playerName = p.playerName || playerName;
-      // handle avatar lama model "avatar1"
-      if (p.playerAvatar && /^avatar\d+$/i.test(p.playerAvatar)) {
-        playerAvatar = "domba";
-      } else {
-        playerAvatar = p.playerAvatar || playerAvatar;
-      }
-      score = p.score ?? score;
-      currentLevel = p.currentLevel ?? currentLevel;
-      maxUnlockedLevel = p.maxUnlockedLevel ?? maxUnlockedLevel;
-      currentTheme = p.currentTheme || 'light1';
-
-      applyTheme(currentTheme);
-      themeBtns.forEach(btn=>{
-        btn.classList.toggle('active', btn.dataset.theme === currentTheme);
-      });
+      try{
+        const p = JSON.parse(saved);
+        playerName = p.playerName || playerName;
+        if(p.playerAvatar && /^avatar\d+$/i.test(p.playerAvatar)) playerAvatar = "domba";
+        else playerAvatar = p.playerAvatar || playerAvatar;
+        score = p.score ?? score;
+        currentLevel = p.currentLevel ?? currentLevel;
+        maxUnlockedLevel = p.maxUnlockedLevel ?? maxUnlockedLevel;
+        currentTheme = p.currentTheme || 'light1';
+        applyTheme(currentTheme);
+        themeBtns.forEach(btn=> btn.classList.toggle('active', btn.dataset.theme === currentTheme));
+      }catch{}
     }
 
-    // =========================
+    // --------------------------
+    // CUSTOM LEVELS (ADMIN)
+    // --------------------------
+    function loadCustomLevels(){
+      try{
+        const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+        Object.keys(obj).forEach(k=>{
+          const n = Number(k); if(!n || n<1 || n>100) return;
+          const d = gameData[n-1];
+          const c = obj[k];
+          d.customImage = c.image || null;
+          d.correctAnswer = c.correct || d.correctAnswer;
+          d.options = c.options && c.options.length === 4 ? c.options : d.options;
+          d.mode = c.mode || d.mode;
+        });
+      }catch{}
+    }
+    function saveCustomLevel(n, payload){
+      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+      obj[n] = payload;
+      localStorage.setItem(LS_KEYS.custom, JSON.stringify(obj));
+      loadCustomLevels();
+      renderAdminList();
+    }
+    function deleteCustomLevel(n){
+      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+      delete obj[n];
+      localStorage.setItem(LS_KEYS.custom, JSON.stringify(obj));
+      loadCustomLevels();
+      renderAdminList();
+    }
+    function renderAdminList(){
+      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+      const keys = Object.keys(obj).sort((a,b)=>Number(a)-Number(b));
+      if(!keys.length){ admList.innerHTML = '<p>Belum ada custom level.</p>'; return; }
+      admList.innerHTML = keys.map(k=>{
+        const c = obj[k];
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <img class="thumb" src="${c.image || ''}" alt="L${k}">
+          <div>
+            <div><b>Level ${k}</b> • Mode: ${c.mode || 'easy'}</div>
+            <div>Jawaban: ${htmlescape(c.correct||'')}</div>
+            ${c.mode==='mcq' ? `<div>Opsi: ${c.options.map(htmlescape).join(' | ')}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // --------------------------
     // UI
-    // =========================
+    // --------------------------
     function updateUI(){
       usernameEl.textContent = playerName;
       userScoreEl.textContent = score;
+      // avatar: coba jpg -> fallback png
+      userAvatarEl.onerror = ()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
       userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
       playerNameInput.value = playerName;
-
-      avatarOptions.forEach(a=>{
-        a.style.borderColor = (a.dataset.avatar === playerAvatar) ? '#3498db' : '#ddd';
-      });
-
+      avatarOptions.forEach(a=> a.style.borderColor = (a.dataset.avatar === playerAvatar) ? '#3498db' : '#ddd' );
       generateLevelButtons();
     }
-
     function showPage(id){
       pages.forEach(p=>p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      navLinks.forEach(l=>l.classList.toggle('active', l.dataset.page===id));
+      navLinks.forEach(l=> l.classList.toggle('active', l.dataset.page===id));
+      if(id==='top-score') renderScoreboard();
+      if(id==='admin') updateAdminGate();
     }
-
     function applyTheme(name){
-      const theme = themes[name];
-      for(const [k,v] of Object.entries(theme)){
-        document.documentElement.style.setProperty(`--${k}`, v);
-      }
-      if(name.startsWith('dark')) document.body.classList.add('dark-theme');
-      else document.body.classList.remove('dark-theme');
-
-      currentTheme = name;
-      saveGameProgress();
+      const t = themes[name]; Object.entries(t).forEach(([k,v])=> document.documentElement.style.setProperty(`--${k}`, v));
+      if(name.startsWith('dark')) document.body.classList.add('dark-theme'); else document.body.classList.remove('dark-theme');
+      currentTheme = name; saveGameProgress();
+    }
+    function updateAdminGate(){
+      const authed = localStorage.getItem(LS_KEYS.admin)==='1';
+      adminLocked.style.display = authed ? 'none' : 'block';
+      adminPanel.style.display = authed ? 'block' : 'none';
+      if(authed) renderAdminList();
     }
 
-    // =========================
+    // --------------------------
     // EVENTS
-    // =========================
-    startBtn.addEventListener('click',()=>{
-      playerName = playerNameInput.value.trim() || 'Player';
-      updateUI();
-      showPage('levels');
+    // --------------------------
+    startBtn.addEventListener('click',()=>{ playerName = playerNameInput.value.trim() || 'Player'; updateUI(); showPage('levels'); });
+    nextBtn.addEventListener('click',()=>{ if(currentLevel < 100) selectLevel(currentLevel+1); else showPage('levels'); });
+    hintBtn.addEventListener('click',()=>{
+      const d = getLevelData(currentLevel);
+      const hint = (d.correctAnswer||'').slice(0,1) + '…';
+      alert(`Hint: ${hint}`);
+    });
+    saveScoreBtn.addEventListener('click',()=>{ addScore(playerName, score, playerAvatar); alert('Skor disimpan! Cek halaman Top Score.'); });
+
+    logoutBtn.addEventListener('click',()=> showPage('home'));
+
+    navLinks.forEach(link=> link.addEventListener('click',e=>{ e.preventDefault(); showPage(link.dataset.page); }));
+
+    themeBtns.forEach(btn=> btn.addEventListener('click',()=>{
+      themeBtns.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); applyTheme(btn.dataset.theme);
+    }));
+
+    avatarOptions.forEach(img=> img.addEventListener('click',()=>{
+      playerAvatar = img.dataset.avatar;
+      userAvatarEl.onerror = ()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
+      userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
+      avatarOptions.forEach(a=> a.style.borderColor = (a===img) ? '#3498db' : '#ddd');
+      saveGameProgress();
+    }));
+
+    // Admin login
+    adminLoginBtn.addEventListener('click',()=>{
+      if(adminPass.value === ADMIN_PASSWORD){ localStorage.setItem(LS_KEYS.admin,'1'); adminPass.value=''; updateAdminGate(); }
+      else alert('Password salah.');
     });
 
-    nextBtn.addEventListener('click',()=>{
-      if(currentLevel < 100) selectLevel(currentLevel + 1);
-      else showPage('levels');
+    // Admin mode switch -> tampil/ sembunyi opsi MCQ
+    admMode.addEventListener('change',()=>{ admMCQWrap.style.display = (admMode.value==='mcq') ? 'grid' : 'none'; });
+
+    // Preview image saat upload
+    admImage.addEventListener('change',()=>{
+      const f = admImage.files && admImage.files[0];
+      if(!f) return; const r = new FileReader();
+      r.onload = e=> { admPreview.src = e.target.result; };
+      r.readAsDataURL(f);
     });
 
-    hintBtn.addEventListener('click',()=>alert("Fitur bantuan akan ditambahkan kemudian!"));
-    logoutBtn.addEventListener('click',()=>showPage('home'));
+    // Simpan/Update custom level
+    admSave.addEventListener('click',()=>{
+      const n = Math.max(1, Math.min(100, parseInt(admLevel.value||'1',10)));
+      const payload = {
+        mode: admMode.value || 'easy',
+        correct: admCorrect.value.trim()
+      };
+      if(payload.mode==='mcq'){
+        const opts = [payload.correct, admWA.value.trim(), admWB.value.trim(), admWC.value.trim()].filter(Boolean);
+        while(opts.length < 4) opts.push('—');
+        payload.options = opts.slice(0,4);
+      }
+      if(admPreview.src && admPreview.src.startsWith('data:')) payload.image = admPreview.src;
 
-    navLinks.forEach(link=>{
-      link.addEventListener('click',e=>{
-        e.preventDefault();
-        showPage(link.dataset.page);
-      });
+      saveCustomLevel(n, payload);
+
+      // sinkron ke gameData sekarang juga
+      const d = gameData[n-1];
+      if(payload.image) d.customImage = payload.image;
+      if(payload.correct) d.correctAnswer = payload.correct;
+      if(payload.options) d.options = payload.options;
+      if(payload.mode) d.mode = payload.mode;
+
+      alert(`Level ${n} disimpan!`);
+      admPreview.src = ''; admImage.value=''; // clear preview
     });
 
-    themeBtns.forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        themeBtns.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        applyTheme(btn.dataset.theme);
-      });
+    // Hapus custom level
+    admDelete.addEventListener('click',()=>{
+      const n = Math.max(1, Math.min(100, parseInt(admLevel.value||'1',10)));
+      deleteCustomLevel(n);
+      const d = gameData[n-1];
+      d.customImage = null; d.mode = GLOBAL_DEFAULT_MODE; // reset ke default
+      alert(`Custom Level ${n} dihapus (kembali ke file static).`);
     });
 
-    avatarOptions.forEach(avatar=>{
-      avatar.addEventListener('click',()=>{
-        playerAvatar = avatar.dataset.avatar;
-        userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
-        avatarOptions.forEach(a=>{
-          a.style.borderColor = (a === avatar) ? '#3498db' : '#ddd';
-        });
-        saveGameProgress();
-      });
-    });
-
-    document.addEventListener('DOMContentLoaded', initGame);
+    // Reset skor & progress
+    admResetScore.addEventListener('click',()=>{ if(confirm('Hapus semua skor?')){ localStorage.removeItem(LS_KEYS.scores); renderScoreboard(); alert('Skor di-reset.'); }});
+    admResetProgress.addEventListener('click',()=>{ if(confirm('Hapus progress pemain?')){ localStorage.removeItem(LS_KEYS.progress); score=0; currentLevel=1; maxUnlockedLevel=1; updateUI(); alert('Progress di-reset.'); }});
   </script>
 </body>
 </html>
