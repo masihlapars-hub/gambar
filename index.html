@@ -1,877 +1,452 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Tebak Gambar</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --accent: #e74c3c;
-            --text: #2c3e50;
-            --background: #f8f9fa;
-            --card-bg: #ffffff;
-            --border: #ddd;
-        }
-
-        .dark-theme {
-            --primary: #2980b9;
-            --secondary: #27ae60;
-            --accent: #c0392b;
-            --text: #ecf0f1;
-            --background: #1a1a2e;
-            --card-bg: #16213e;
-            --border: #34495e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 2px solid var(--primary);
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 20px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: all 0.3s;
-        }
-
-        nav a:hover, nav a.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 3fr;
-            gap: 30px;
-        }
-
-        .sidebar {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--primary);
-            margin: 0 auto 15px;
-            overflow: hidden;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .username {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .user-score {
-            color: var(--secondary);
-            font-weight: 500;
-        }
-
-        .theme-selector {
-            margin-bottom: 30px;
-        }
-
-        .theme-selector h3 {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .theme-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .theme-btn {
-            padding: 10px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            background: none;
-            cursor: pointer;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .theme-btn.active {
-            border-color: var(--primary);
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .content {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .login-form h2, .level-select h2, .game-container h2 {
-            margin-bottom: 20px;
-            color: var(--primary);
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--background);
-            color: var(--text);
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary);
-        }
-
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .level-btn {
-            aspect-ratio: 1;
-            border-radius: 10px;
-            border: 2px solid var(--border);
-            background-color: var(--background);
-            color: var(--text);
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .level-btn.unlocked {
-            border-color: var(--secondary);
-            background-color: rgba(46, 204, 113, 0.1);
-        }
-
-        .level-btn.current {
-            border-color: var(--primary);
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .level-btn.completed {
-            border-color: var(--secondary);
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .game-image {
-            width: 100%;
-            max-width: 500px;
-            height: 300px;
-            margin: 0 auto 30px;
-            border: 3px dashed var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .game-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .game-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .option-btn {
-            padding: 15px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            background: none;
-            color: var(--text);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .option-btn:hover {
-            border-color: var(--primary);
-            background-color: rgba(52, 152, 219, 0.1);
-        }
-
-        .option-btn.correct {
-            border-color: var(--secondary);
-            background-color: rgba(46, 204, 113, 0.2);
-        }
-
-        .option-btn.incorrect {
-            border-color: var(--accent);
-            background-color: rgba(231, 76, 60, 0.2);
-        }
-
-        .game-feedback {
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            min-height: 40px;
-        }
-
-        .correct-feedback {
-            color: var(--secondary);
-        }
-
-        .incorrect-feedback {
-            color: var(--accent);
-        }
-
-        .game-controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .btn-secondary {
-            background-color: var(--background);
-            color: var(--text);
-            border: 2px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .game-options {
-                grid-template-columns: 1fr;
-            }
-            
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Tebak Gambar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary:#3498db; --secondary:#2ecc71; --accent:#e74c3c;
+      --text:#2c3e50; --background:#f8f9fa; --card-bg:#ffffff; --border:#ddd;
+    }
+    .dark-theme{
+      --primary:#2980b9; --secondary:#27ae60; --accent:#c0392b;
+      --text:#ecf0f1; --background:#1a1a2e; --card-bg:#16213e; --border:#34495e;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;transition:background-color .3s,color .3s}
+    body{background-color:var(--background);color:var(--text);min-height:100vh;padding:20px}
+    .container{max-width:1200px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:2px solid var(--primary);margin-bottom:30px}
+    .logo{font-size:2rem;font-weight:bold;color:var(--primary)}
+    nav ul{display:flex;list-style:none;gap:20px}
+    nav a{text-decoration:none;color:var(--text);font-weight:500;padding:8px 15px;border-radius:20px;transition:all .3s}
+    nav a:hover,nav a.active{background-color:var(--primary);color:#fff}
+    .main-content{display:grid;grid-template-columns:1fr 3fr;gap:30px}
+    .sidebar{background-color:var(--card-bg);border-radius:15px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .user-info{text-align:center;margin-bottom:30px}
+    .avatar{width:100px;height:100px;border-radius:50%;border:3px solid var(--primary);margin:0 auto 15px;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .username{font-size:1.2rem;font-weight:bold;margin-bottom:5px}
+    .user-score{color:var(--secondary);font-weight:500}
+    .theme-selector{margin-bottom:30px}
+    .theme-selector h3{margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .theme-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .theme-btn{padding:10px;border:2px solid var(--border);border-radius:10px;background:none;cursor:pointer;text-align:center;font-weight:500}
+    .theme-btn.active{border-color:var(--primary);background-color:var(--primary);color:#fff}
+    .content{background-color:var(--card-bg);border-radius:15px;padding:30px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .page{display:none}.page.active{display:block}
+    .login-form h2,.level-select h2,.game-container h2{margin-bottom:20px;color:var(--primary);text-align:center}
+    .form-group{margin-bottom:20px}
+    .form-group label{display:block;margin-bottom:8px;font-weight:500}
+    .form-group input{width:100%;padding:12px 15px;border:2px solid var(--border);border-radius:8px;font-size:1rem;background-color:var(--background);color:var(--text)}
+    .btn{padding:12px 25px;border:none;border-radius:30px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s}
+    .btn-primary{background-color:var(--primary);color:#fff}
+    .btn-primary:hover{background-color:var(--secondary)}
+    .btn-block{display:block;width:100%}
+    .levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:15px;margin-top:30px}
+    .level-btn{aspect-ratio:1;border-radius:10px;border:2px solid var(--border);background-color:var(--background);color:var(--text);font-size:1.2rem;font-weight:bold;cursor:pointer;transition:all .3s}
+    .level-btn.unlocked{border-color:var(--secondary);background-color:rgba(46,204,113,.1)}
+    .level-btn.current{border-color:var(--primary);background-color:var(--primary);color:#fff}
+    .level-btn.completed{border-color:var(--secondary);background-color:var(--secondary);color:#fff}
+    .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid var(--border)}
+    .game-image{width:100%;max-width:500px;height:300px;margin:0 auto 30px;border:3px dashed var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .game-image img{max-width:100%;max-height:100%;object-fit:contain}
+    .game-options{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:30px}
+    .option-btn{padding:15px;border:2px solid var(--border);border-radius:10px;background:none;color:var(--text);font-size:1rem;font-weight:500;cursor:pointer;transition:all .3s}
+    .option-btn:hover{border-color:var(--primary);background-color:rgba(52,152,219,.1)}
+    .option-btn.correct{border-color:var(--secondary);background-color:rgba(46,204,113,.2)}
+    .option-btn.incorrect{border-color:var(--accent);background-color:rgba(231,76,60,.2)}
+    .game-feedback{text-align:center;font-size:1.2rem;font-weight:bold;margin-bottom:20px;min-height:40px}
+    .correct-feedback{color:var(--secondary)} .incorrect-feedback{color:var(--accent)}
+    .game-controls{display:flex;justify-content:center;gap:15px}
+    .btn-secondary{background-color:var(--background);color:var(--text);border:2px solid var(--border)}
+    .btn-secondary:hover{background-color:var(--border)}
+    footer{text-align:center;margin-top:50px;padding-top:20px;border-top:1px solid var(--border);color:var(--text);font-size:.9rem}
+    @media (max-width:768px){.main-content{grid-template-columns:1fr}.game-options{grid-template-columns:1fr}nav ul{flex-wrap:wrap;justify-content:center}}
+  </style>
 </head>
 <body class="light-theme">
-    <div class="container">
-        <header>
-            <div class="logo">Tebak Gambar</div>
-            <nav>
-                <ul>
-                    <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
-                    <li><a href="#" class="nav-link" data-page="levels">Level</a></li>
-                    <li><a href="#" class="nav-link" data-page="top-score">Top Score</a></li>
-                    <li><a href="#" class="nav-link" data-page="admin">Admin</a></li>
-                    <li><a href="#" class="nav-link" id="logout-btn">Logout</a></li>
-                </ul>
-            </nav>
-        </header>
+  <div class="container">
+    <header>
+      <div class="logo">Tebak Gambar</div>
+      <nav>
+        <ul>
+          <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+          <li><a href="#" class="nav-link" data-page="levels">Level</a></li>
+          <li><a href="#" class="nav-link" data-page="top-score">Top Score</a></li>
+          <li><a href="#" class="nav-link" data-page="admin">Admin</a></li>
+          <li><a href="#" class="nav-link" id="logout-btn">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
 
-        <div class="main-content">
-            <aside class="sidebar">
-                <div class="user-info">
-                    <div class="avatar">
-                        <img src="static/avatars/avatar1.png" alt="Avatar" id="user-avatar">
-                    </div>
-                    <div class="username" id="username">Guest</div>
-                    <div class="user-score">Skor: <span id="user-score">0</span></div>
-                </div>
-
-                <div class="theme-selector">
-                    <h3>Pilih Tema</h3>
-                    <div class="theme-options">
-                        <button class="theme-btn active" data-theme="light1">Terang 1</button>
-                        <button class="theme-btn" data-theme="light2">Terang 2</button>
-                        <button class="theme-btn" data-theme="light3">Terang 3</button>
-                        <button class="theme-btn" data-theme="light4">Terang 4</button>
-                        <button class="theme-btn" data-theme="dark1">Gelap 1</button>
-                        <button class="theme-btn" data-theme="dark2">Gelap 2</button>
-                        <button class="theme-btn" data-theme="dark3">Gelap 3</button>
-                        <button class="theme-btn" data-theme="dark4">Gelap 4</button>
-                    </div>
-                </div>
-            </aside>
-
-            <main class="content">
-                <!-- Halaman Login -->
-                <div class="page active" id="home">
-                    <div class="login-form">
-                        <h2>Login Pemain</h2>
-                        <div class="form-group">
-                            <label for="player-name">Nama Pemain</label>
-                            <input type="text" id="player-name" placeholder="Masukkan nama Anda">
-                        </div>
-                        
-                        <h3>Pilih Avatar</h3>
-                        <div class="avatar-options">
-                            <div class="avatar-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0;">
-                                <img src="static/avatar/domba.png" class="avatar-option" data-avatar="avatar1" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/bebek.png" class="avatar-option" data-avatar="avatar2" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/koala.png" class="avatar-option" data-avatar="avatar3" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/naga.png" class="avatar-option" data-avatar="avatar4" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/cat.png" class="avatar-option" data-avatar="avatar5" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/monkey.png" class="avatar-option" data-avatar="avatar6" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/pinguin.png" class="avatar-option" data-avatar="avatar7" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                                <img src="static/avatar/kelinci.png" class="avatar-option" data-avatar="avatar8" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;">
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary btn-block" id="start-btn">Mulai Bermain</button>
-                    </div>
-                </div>
-
-                <!-- Halaman Level -->
-                <div class="page" id="levels">
-                    <div class="level-select">
-                        <h2>Pilih Level</h2>
-                        <div class="levels-grid" id="levels-grid">
-                            <!-- Level buttons will be generated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Halaman Game -->
-                <div class="page" id="game">
-                    <div class="game-container">
-                        <div class="game-header">
-                            <div class="level-info">Level <span id="current-level">1</span></div>
-                            <div class="score-info">Skor: <span id="current-score">0</span></div>
-                        </div>
-
-                        <div class="game-image">
-                            <img id="game-img" src="" alt="Gambar tebakan">
-                        </div>
-
-                        <div class="game-options" id="options-container">
-                            <!-- Options will be generated here -->
-                        </div>
-
-                        <div class="game-feedback" id="feedback"></div>
-
-                        <div class="game-controls">
-                            <button class="btn btn-secondary" id="hint-btn">Bantuan</button>
-                            <button class="btn btn-primary" id="next-btn" style="display: none;">Lanjut</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Halaman Top Score -->
-                <div class="page" id="top-score">
-                    <h2>Top Score</h2>
-                    <div id="scoreboard">
-                        <!-- Scoreboard will be generated here -->
-                    </div>
-                </div>
-
-                <!-- Halaman Admin -->
-                <div class="page" id="admin">
-                    <h2>Panel Admin</h2>
-                    <p>Fitur admin akan ditambahkan kemudian.</p>
-                </div>
-            </main>
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="user-info">
+          <div class="avatar">
+            <img src="static/avatar/domba.jpg" alt="Avatar" id="user-avatar">
+          </div>
+          <div class="username" id="username">Guest</div>
+          <div class="user-score">Skor: <span id="user-score">0</span></div>
         </div>
 
-        <footer>
-            <p>&copy; 2025 Game Tebak Gambar. All rights reserved.</p>
-        </footer>
+        <div class="theme-selector">
+          <h3>Pilih Tema</h3>
+          <div class="theme-options">
+            <button class="theme-btn active" data-theme="light1">Terang 1</button>
+            <button class="theme-btn" data-theme="light2">Terang 2</button>
+            <button class="theme-btn" data-theme="light3">Terang 3</button>
+            <button class="theme-btn" data-theme="light4">Terang 4</button>
+            <button class="theme-btn" data-theme="dark1">Gelap 1</button>
+            <button class="theme-btn" data-theme="dark2">Gelap 2</button>
+            <button class="theme-btn" data-theme="dark3">Gelap 3</button>
+            <button class="theme-btn" data-theme="dark4">Gelap 4</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Halaman Login -->
+        <div class="page active" id="home">
+          <div class="login-form">
+            <h2>Login Pemain</h2>
+            <div class="form-group">
+              <label for="player-name">Nama Pemain</label>
+              <input type="text" id="player-name" placeholder="Masukkan nama Anda">
+            </div>
+
+            <h3>Pilih Avatar</h3>
+            <div class="avatar-options">
+              <div class="avatar-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;">
+                <img src="static/avatar/domba.jpg"  class="avatar-option" data-avatar="domba"  style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/bebek.jpg"  class="avatar-option" data-avatar="bebek"  style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/koala.jpg"  class="avatar-option" data-avatar="koala"  style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/cat.jpg"    class="avatar-option" data-avatar="cat"    style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/babi.jpg"   class="avatar-option" data-avatar="babi"   style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/bear.jpg"   class="avatar-option" data-avatar="bear"   style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/kelinci.jpg"class="avatar-option" data-avatar="kelinci"style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+                <img src="static/avatar/kodok.jpg"  class="avatar-option" data-avatar="kodok"  style="width:70px;height:70px;border-radius:50%;border:2px solid #ddd;cursor:pointer;">
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-block" id="start-btn">Mulai Bermain</button>
+          </div>
+        </div>
+
+        <!-- Halaman Level -->
+        <div class="page" id="levels">
+          <div class="level-select">
+            <h2>Pilih Level</h2>
+            <div class="levels-grid" id="levels-grid"></div>
+          </div>
+        </div>
+
+        <!-- Halaman Game -->
+        <div class="page" id="game">
+          <div class="game-container">
+            <div class="game-header">
+              <div class="level-info">Level <span id="current-level">1</span></div>
+              <div class="score-info">Skor: <span id="current-score">0</span></div>
+            </div>
+
+            <div class="game-image">
+              <img id="game-img" src="" alt="Gambar tebakan">
+            </div>
+
+            <div class="game-options" id="options-container"></div>
+
+            <div class="game-feedback" id="feedback"></div>
+
+            <div class="game-controls">
+              <button class="btn btn-secondary" id="hint-btn">Bantuan</button>
+              <button class="btn btn-primary" id="next-btn" style="display:none;">Lanjut</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Halaman Top Score -->
+        <div class="page" id="top-score">
+          <h2>Top Score</h2>
+          <div id="scoreboard"></div>
+        </div>
+
+        <!-- Halaman Admin -->
+        <div class="page" id="admin">
+          <h2>Panel Admin</h2>
+          <p>Fitur admin akan ditambahkan kemudian.</p>
+        </div>
+      </main>
     </div>
 
-    <script>
-        // Data game - gambar disimpan di folder static/images
-        // Untuk demo, kita buat data untuk 10 level pertama
-        const gameData = [];
-        for (let i = 1; i <= 100; i++) {
-            gameData.push({
-                image: `static/images/level${i}.jpg`,
-                correctAnswer: `Jawaban Level ${i}`,
-                options: [
-                    `Jawaban Level ${i}`,
-                    `Opsi Salah A ${i}`,
-                    `Opsi Salah B ${i}`,
-                    `Opsi Salah C ${i}`
-                ]
-            });
+    <footer>
+      <p>&copy; 2025 Game Tebak Gambar. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // =========================
+    // DATA LEVEL (pakai static/level)
+    // =========================
+    const gameData = [];
+    for (let i = 1; i <= 100; i++) {
+      gameData.push({
+        image: `static/level/level${i}.jpg`,
+        correctAnswer: `Jawaban Level ${i}`,
+        options: [
+          `Jawaban Level ${i}`,
+          `Opsi Salah A ${i}`,
+          `Opsi Salah B ${i}`,
+          `Opsi Salah C ${i}`
+        ]
+      });
+    }
+
+    // =========================
+    // TEMA
+    // =========================
+    const themes = {
+      light1:{primary:"#3498db",secondary:"#2ecc71",accent:"#e74c3c",text:"#2c3e50",background:"#f8f9fa",cardBg:"#ffffff",border:"#ddd"},
+      light2:{primary:"#9b59b6",secondary:"#1abc9c",accent:"#e67e22",text:"#34495e",background:"#ecf0f1",cardBg:"#ffffff",border:"#bdc3c7"},
+      light3:{primary:"#e74c3c",secondary:"#f1c40f",accent:"#9b59b6",text:"#2c3e50",background:"#fef9e7",cardBg:"#ffffff",border:"#f9e79f"},
+      light4:{primary:"#2c3e50",secondary:"#16a085",accent:"#c0392b",text:"#2c3e50",background:"#f5f5f5",cardBg:"#ffffff",border:"#ddd"},
+      dark1:{primary:"#2980b9",secondary:"#27ae60",accent:"#c0392b",text:"#ecf0f1",background:"#1a1a2e",cardBg:"#16213e",border:"#34495e"},
+      dark2:{primary:"#8e44ad",secondary:"#16a085",accent:"#d35400",text:"#ecf0f1",background:"#2c2c54",cardBg:"#40407a",border:"#706fd3"},
+      dark3:{primary:"#e74c3c",secondary:"#f39c12",accent:"#9b59b6",text:"#ecf0f1",background:"#2d3436",cardBg:"#636e72",border:"#b2bec3"},
+      dark4:{primary:"#2c3e50",secondary:"#1abc9c",accent:"#e74c3c",text:"#ecf0f1",background:"#0c2461",cardBg:"#1e3799",border:"#4a69bd"}
+    };
+
+    // =========================
+    // STATE
+    // =========================
+    let currentLevel = 1;
+    let score = 0;
+    let maxUnlockedLevel = 1;
+    let playerName = "Guest";
+    // default avatar pakai nama file tanpa ekstensi
+    let playerAvatar = "domba";
+    let currentTheme = "light1";
+
+    // =========================
+    // DOM
+    // =========================
+    const usernameEl = document.getElementById('username');
+    const userScoreEl = document.getElementById('user-score');
+    const userAvatarEl = document.getElementById('user-avatar');
+    const playerNameInput = document.getElementById('player-name');
+    const startBtn = document.getElementById('start-btn');
+    const levelsGrid = document.getElementById('levels-grid');
+    const currentLevelEl = document.getElementById('current-level');
+    const currentScoreEl = document.getElementById('current-score');
+    const gameImg = document.getElementById('game-img');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const hintBtn = document.getElementById('hint-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page');
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+
+    // =========================
+    // INIT
+    // =========================
+    function initGame(){
+      generateLevelButtons();
+      loadGameProgress();
+      updateUI();
+    }
+
+    // =========================
+    // LEVEL BUTTONS
+    // =========================
+    function generateLevelButtons(){
+      levelsGrid.innerHTML = '';
+      for(let i=1;i<=100;i++){
+        const levelBtn = document.createElement('button');
+        levelBtn.className = 'level-btn';
+        levelBtn.textContent = i;
+        levelBtn.dataset.level = i;
+
+        if(i === currentLevel) levelBtn.classList.add('current');
+        else if(i < currentLevel) levelBtn.classList.add('completed');
+        else if(i === maxUnlockedLevel) levelBtn.classList.add('unlocked');
+
+        if(i <= maxUnlockedLevel){
+          levelBtn.addEventListener('click',()=>selectLevel(i));
         }
+        levelsGrid.appendChild(levelBtn);
+      }
+    }
 
-        // Data tema
-        const themes = {
-            light1: {
-                primary: "#3498db",
-                secondary: "#2ecc71",
-                accent: "#e74c3c",
-                text: "#2c3e50",
-                background: "#f8f9fa",
-                cardBg: "#ffffff",
-                border: "#ddd"
-            },
-            light2: {
-                primary: "#9b59b6",
-                secondary: "#1abc9c",
-                accent: "#e67e22",
-                text: "#34495e",
-                background: "#ecf0f1",
-                cardBg: "#ffffff",
-                border: "#bdc3c7"
-            },
-            light3: {
-                primary: "#e74c3c",
-                secondary: "#f1c40f",
-                accent: "#9b59b6",
-                text: "#2c3e50",
-                background: "#fef9e7",
-                cardBg: "#ffffff",
-                border: "#f9e79f"
-            },
-            light4: {
-                primary: "#2c3e50",
-                secondary: "#16a085",
-                accent: "#c0392b",
-                text: "#2c3e50",
-                background: "#f5f5f5",
-                cardBg: "#ffffff",
-                border: "#ddd"
-            },
-            dark1: {
-                primary: "#2980b9",
-                secondary: "#27ae60",
-                accent: "#c0392b",
-                text: "#ecf0f1",
-                background: "#1a1a2e",
-                cardBg: "#16213e",
-                border: "#34495e"
-            },
-            dark2: {
-                primary: "#8e44ad",
-                secondary: "#16a085",
-                accent: "#d35400",
-                text: "#ecf0f1",
-                background: "#2c2c54",
-                cardBg: "#40407a",
-                border: "#706fd3"
-            },
-            dark3: {
-                primary: "#e74c3c",
-                secondary: "#f39c12",
-                accent: "#9b59b6",
-                text: "#ecf0f1",
-                background: "#2d3436",
-                cardBg: "#636e72",
-                border: "#b2bec3"
-            },
-            dark4: {
-                primary: "#2c3e50",
-                secondary: "#1abc9c",
-                accent: "#e74c3c",
-                text: "#ecf0f1",
-                background: "#0c2461",
-                cardBg: "#1e3799",
-                border: "#4a69bd"
-            }
-        };
+    function selectLevel(level){
+      currentLevel = level;
+      showPage('game');
+      loadLevel(level);
+    }
 
-        // State game
-        let currentLevel = 1;
-        let score = 0;
-        let maxUnlockedLevel = 1;
-        let playerName = "Guest";
-        let playerAvatar = "avatar1";
-        let currentTheme = "light1";
+    function loadLevel(level){
+      const levelData = gameData[level-1];
+      currentLevelEl.textContent = level;
+      currentScoreEl.textContent = score;
 
-        // Elemen DOM
-        const usernameEl = document.getElementById('username');
-        const userScoreEl = document.getElementById('user-score');
-        const userAvatarEl = document.getElementById('user-avatar');
-        const playerNameInput = document.getElementById('player-name');
-        const startBtn = document.getElementById('start-btn');
-        const levelsGrid = document.getElementById('levels-grid');
-        const currentLevelEl = document.getElementById('current-level');
-        const currentScoreEl = document.getElementById('current-score');
-        const gameImg = document.getElementById('game-img');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackEl = document.getElementById('feedback');
-        const nextBtn = document.getElementById('next-btn');
-        const hintBtn = document.getElementById('hint-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const pages = document.querySelectorAll('.page');
-        const themeBtns = document.querySelectorAll('.theme-btn');
-        const avatarOptions = document.querySelectorAll('.avatar-option');
+      // pakai gambar dari static/level, fallback ke placeholder jika tidak ada
+      gameImg.onerror = () => {
+        gameImg.onerror = null;
+        gameImg.src = `https://via.placeholder.com/500x300/3498db/ffffff?text=Level+${level}`;
+      };
+      gameImg.src = levelData.image;
+      gameImg.alt = `Gambar untuk level ${level}`;
 
-        // Inisialisasi game
-        function initGame() {
-            generateLevelButtons();
-            loadGameProgress();
-            updateUI();
+      const shuffledOptions = [...levelData.options].sort(()=>Math.random()-0.5);
+      optionsContainer.innerHTML = '';
+      shuffledOptions.forEach(option=>{
+        const optionBtn = document.createElement('button');
+        optionBtn.className = 'option-btn';
+        optionBtn.textContent = option;
+        optionBtn.addEventListener('click',()=>checkAnswer(option, levelData.correctAnswer));
+        optionsContainer.appendChild(optionBtn);
+      });
+
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'game-feedback';
+      nextBtn.style.display = 'none';
+    }
+
+    function checkAnswer(selected, correct){
+      const btns = document.querySelectorAll('.option-btn');
+      btns.forEach(b=>{
+        b.disabled = true;
+        if(b.textContent === correct) b.classList.add('correct');
+        else if(b.textContent === selected && selected !== correct) b.classList.add('incorrect');
+      });
+
+      if(selected === correct){
+        feedbackEl.textContent = "Benar! 🎉";
+        feedbackEl.classList.add('correct-feedback');
+        score += 10;
+        userScoreEl.textContent = score;
+        currentScoreEl.textContent = score;
+        if(currentLevel === maxUnlockedLevel){
+          maxUnlockedLevel = Math.min(maxUnlockedLevel + 1, 100);
         }
+        saveGameProgress();
+      }else{
+        feedbackEl.textContent = `Salah! Jawaban yang benar: ${correct}`;
+        feedbackEl.classList.add('incorrect-feedback');
+      }
+      nextBtn.style.display = 'block';
+    }
 
-        // Generate tombol level
-        function generateLevelButtons() {
-            levelsGrid.innerHTML = '';
-            for (let i = 1; i <= 100; i++) {
-                const levelBtn = document.createElement('button');
-                levelBtn.className = 'level-btn';
-                levelBtn.textContent = i;
-                levelBtn.dataset.level = i;
-                
-                if (i === currentLevel) {
-                    levelBtn.classList.add('current');
-                } else if (i < currentLevel) {
-                    levelBtn.classList.add('completed');
-                } else if (i === maxUnlockedLevel) {
-                    levelBtn.classList.add('unlocked');
-                }
-                
-                if (i <= maxUnlockedLevel) {
-                    levelBtn.addEventListener('click', () => selectLevel(i));
-                }
-                
-                levelsGrid.appendChild(levelBtn);
-            }
-        }
+    // =========================
+    // STORAGE
+    // =========================
+    function saveGameProgress(){
+      const data = {playerName, playerAvatar, score, currentLevel, maxUnlockedLevel, currentTheme};
+      localStorage.setItem('tebakGambarProgress', JSON.stringify(data));
+    }
 
-        // Pilih level
-        function selectLevel(level) {
-            currentLevel = level;
-            showPage('game');
-            loadLevel(level);
-        }
+    function loadGameProgress(){
+      const saved = localStorage.getItem('tebakGambarProgress');
+      if(!saved) return;
+      const p = JSON.parse(saved);
+      playerName = p.playerName || playerName;
+      // handle avatar lama model "avatar1"
+      if (p.playerAvatar && /^avatar\d+$/i.test(p.playerAvatar)) {
+        playerAvatar = "domba";
+      } else {
+        playerAvatar = p.playerAvatar || playerAvatar;
+      }
+      score = p.score ?? score;
+      currentLevel = p.currentLevel ?? currentLevel;
+      maxUnlockedLevel = p.maxUnlockedLevel ?? maxUnlockedLevel;
+      currentTheme = p.currentTheme || 'light1';
 
-        // Load level
-        function loadLevel(level) {
-            const levelData = gameData[level - 1];
-            currentLevelEl.textContent = level;
-            currentScoreEl.textContent = score;
-            
-            // Untuk demo, kita gunakan placeholder image
-            gameImg.src = `https://via.placeholder.com/500x300/3498db/ffffff?text=Gambar+Level+${level}`;
-            gameImg.alt = `Gambar untuk level ${level}`;
-            
-            // Acak opsi jawaban
-            const shuffledOptions = [...levelData.options].sort(() => Math.random() - 0.5);
-            
-            // Buat tombol opsi
-            optionsContainer.innerHTML = '';
-            shuffledOptions.forEach(option => {
-                const optionBtn = document.createElement('button');
-                optionBtn.className = 'option-btn';
-                optionBtn.textContent = option;
-                optionBtn.addEventListener('click', () => checkAnswer(option, levelData.correctAnswer));
-                optionsContainer.appendChild(optionBtn);
-            });
-            
-            // Reset feedback dan sembunyikan tombol next
-            feedbackEl.textContent = '';
-            feedbackEl.className = 'game-feedback';
-            nextBtn.style.display = 'none';
-        }
+      applyTheme(currentTheme);
+      themeBtns.forEach(btn=>{
+        btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+      });
+    }
 
-        // Periksa jawaban
-        function checkAnswer(selectedOption, correctAnswer) {
-            const optionBtns = document.querySelectorAll('.option-btn');
-            optionBtns.forEach(btn => {
-                btn.disabled = true;
-                if (btn.textContent === correctAnswer) {
-                    btn.classList.add('correct');
-                } else if (btn.textContent === selectedOption && selectedOption !== correctAnswer) {
-                    btn.classList.add('incorrect');
-                }
-            });
-            
-            if (selectedOption === correctAnswer) {
-                feedbackEl.textContent = "Benar! 🎉";
-                feedbackEl.classList.add('correct-feedback');
-                score += 10;
-                userScoreEl.textContent = score;
-                currentScoreEl.textContent = score;
-                
-                // Buka level berikutnya jika ini adalah level tertinggi yang dibuka
-                if (currentLevel === maxUnlockedLevel) {
-                    maxUnlockedLevel = Math.min(maxUnlockedLevel + 1, 100);
-                }
-                
-                saveGameProgress();
-            } else {
-                feedbackEl.textContent = `Salah! Jawaban yang benar: ${correctAnswer}`;
-                feedbackEl.classList.add('incorrect-feedback');
-            }
-            
-            nextBtn.style.display = 'block';
-        }
+    // =========================
+    // UI
+    // =========================
+    function updateUI(){
+      usernameEl.textContent = playerName;
+      userScoreEl.textContent = score;
+      userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
+      playerNameInput.value = playerName;
 
-        // Simpan progress game
-        function saveGameProgress() {
-            const gameProgress = {
-                playerName,
-                playerAvatar,
-                score,
-                currentLevel,
-                maxUnlockedLevel,
-                currentTheme
-            };
-            localStorage.setItem('tebakGambarProgress', JSON.stringify(gameProgress));
-        }
+      avatarOptions.forEach(a=>{
+        a.style.borderColor = (a.dataset.avatar === playerAvatar) ? '#3498db' : '#ddd';
+      });
 
-        // Load progress game
-        function loadGameProgress() {
-            const savedProgress = localStorage.getItem('tebakGambarProgress');
-            if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                playerName = progress.playerName;
-                playerAvatar = progress.playerAvatar;
-                score = progress.score;
-                currentLevel = progress.currentLevel;
-                maxUnlockedLevel = progress.maxUnlockedLevel;
-                currentTheme = progress.currentTheme || 'light1';
-                
-                // Terapkan tema
-                applyTheme(currentTheme);
-                
-                // Update tombol tema
-                themeBtns.forEach(btn => {
-                    if (btn.dataset.theme === currentTheme) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-        }
+      generateLevelButtons();
+    }
 
-        // Update UI
-        function updateUI() {
-            usernameEl.textContent = playerName;
-            userScoreEl.textContent = score;
-            userAvatarEl.src = `static/avatars/${playerAvatar}.png`;
-            playerNameInput.value = playerName;
-            
-            // Update avatar selection
-            avatarOptions.forEach(avatar => {
-                if (avatar.dataset.avatar === playerAvatar) {
-                    avatar.style.borderColor = '#3498db';
-                } else {
-                    avatar.style.borderColor = '#ddd';
-                }
-            });
-            
-            generateLevelButtons();
-        }
+    function showPage(id){
+      pages.forEach(p=>p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      navLinks.forEach(l=>l.classList.toggle('active', l.dataset.page===id));
+    }
 
-        // Tampilkan halaman
-        function showPage(pageId) {
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
-            
-            // Update navigasi
-            navLinks.forEach(link => {
-                if (link.dataset.page === pageId) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
+    function applyTheme(name){
+      const theme = themes[name];
+      for(const [k,v] of Object.entries(theme)){
+        document.documentElement.style.setProperty(`--${k}`, v);
+      }
+      if(name.startsWith('dark')) document.body.classList.add('dark-theme');
+      else document.body.classList.remove('dark-theme');
 
-        // Terapkan tema
-        function applyTheme(themeName) {
-            const theme = themes[themeName];
-            for (const [property, value] of Object.entries(theme)) {
-                document.documentElement.style.setProperty(`--${property}`, value);
-            }
-            
-            // Tambahkan/hapus kelas dark-theme
-            if (themeName.startsWith('dark')) {
-                document.body.classList.add('dark-theme');
-            } else {
-                document.body.classList.remove('dark-theme');
-            }
-            
-            currentTheme = themeName;
-            saveGameProgress();
-        }
+      currentTheme = name;
+      saveGameProgress();
+    }
 
-        // Event Listeners
-        startBtn.addEventListener('click', () => {
-            playerName = playerNameInput.value.trim() || 'Player';
-            updateUI();
-            showPage('levels');
+    // =========================
+    // EVENTS
+    // =========================
+    startBtn.addEventListener('click',()=>{
+      playerName = playerNameInput.value.trim() || 'Player';
+      updateUI();
+      showPage('levels');
+    });
+
+    nextBtn.addEventListener('click',()=>{
+      if(currentLevel < 100) selectLevel(currentLevel + 1);
+      else showPage('levels');
+    });
+
+    hintBtn.addEventListener('click',()=>alert("Fitur bantuan akan ditambahkan kemudian!"));
+    logoutBtn.addEventListener('click',()=>showPage('home'));
+
+    navLinks.forEach(link=>{
+      link.addEventListener('click',e=>{
+        e.preventDefault();
+        showPage(link.dataset.page);
+      });
+    });
+
+    themeBtns.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        themeBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        applyTheme(btn.dataset.theme);
+      });
+    });
+
+    avatarOptions.forEach(avatar=>{
+      avatar.addEventListener('click',()=>{
+        playerAvatar = avatar.dataset.avatar;
+        userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
+        avatarOptions.forEach(a=>{
+          a.style.borderColor = (a === avatar) ? '#3498db' : '#ddd';
         });
+        saveGameProgress();
+      });
+    });
 
-        nextBtn.addEventListener('click', () => {
-            if (currentLevel < 100) {
-                selectLevel(currentLevel + 1);
-            } else {
-                showPage('levels');
-            }
-        });
-
-        hintBtn.addEventListener('click', () => {
-            alert("Fitur bantuan akan ditambahkan kemudian!");
-        });
-
-        logoutBtn.addEventListener('click', () => {
-            showPage('home');
-        });
-
-        // Navigasi
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = link.dataset.page;
-                showPage(page);
-            });
-        });
-
-        // Pilih tema
-        themeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                themeBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                applyTheme(btn.dataset.theme);
-            });
-        });
-
-        // Pilih avatar
-        avatarOptions.forEach(avatar => {
-            avatar.addEventListener('click', () => {
-                playerAvatar = avatar.dataset.avatar;
-                userAvatarEl.src = `static/avatars/${playerAvatar}.png`;
-                
-                // Update border pada avatar yang dipilih
-                avatarOptions.forEach(a => {
-                    a.style.borderColor = a === avatar ? '#3498db' : '#ddd';
-                });
-            });
-        });
-
-        // Inisialisasi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', initGame);
-    </script>
+    document.addEventListener('DOMContentLoaded', initGame);
+  </script>
 </body>
 </html>
