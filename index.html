@@ -312,15 +312,34 @@
     const admSave=$('#adm-save'), admDelete=$('#adm-delete'), admResetScore=$('#adm-reset-score'), admResetProgress=$('#adm-reset-progress');
     const admList=$('#adm-list'), admMCQWrap=$('#adm-mcq');
 
+    // ====== PATCH PUBLIC JSON ======
+    async function loadLevelsJson() {
+      try {
+        const res = await fetch('static/levels.json?v=' + Date.now());
+        if (!res.ok) return; // jika file tidak ada, lewati
+        const data = await res.json();
+        Object.entries(data).forEach(([lvl, cfg])=>{
+          const i = Number(lvl) - 1;
+          if (!gameData[i]) return;
+          if (cfg.correct) gameData[i].correctAnswer = cfg.correct;
+          if (cfg.options && cfg.options.length === 4) gameData[i].options = cfg.options;
+          if (cfg.mode) gameData[i].mode = cfg.mode; // "easy" | "mcq"
+        });
+      } catch (e) {
+        console.warn('levels.json tidak terbaca:', e);
+      }
+    }
+
     // ====== INIT ======
-    document.addEventListener('DOMContentLoaded', ()=>{
-      loadCustomLevels();
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      loadCustomLevels();          // dari Admin (local, device ini)
+      await loadLevelsJson();      // <-- patch: ambil kunci publik di repo
       generateLevelButtons();
       loadGameProgress();
       updateUI();
       renderScoreboard();
       updateAdminGate();
-      admMCQWrap.style.display = (admMode.value==='mcq') ? 'grid' : 'none';
+      try { admMCQWrap.style.display = (admMode.value==='mcq') ? 'grid' : 'none'; } catch {}
     });
 
     // ====== LEVEL BUTTONS ======
@@ -453,8 +472,7 @@
       const key=LS_KEYS.custom;
       const obj=JSON.parse(localStorage.getItem(key)||'{}');
       obj[n]=payload;
-      // bisa lempar error jika storage penuh
-      localStorage.setItem(key, JSON.stringify(obj));
+      localStorage.setItem(key, JSON.stringify(obj)); // bisa lempar error jika storage penuh
       loadCustomLevels(); renderAdminList();
     }
     function deleteCustomLevel(n){
