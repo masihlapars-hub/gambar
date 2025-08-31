@@ -34,7 +34,7 @@
     .form-group{margin-bottom:20px}
     .form-group label{display:block;margin-bottom:8px;font-weight:500}
     .form-group input,.form-group select{width:100%;padding:12px 15px;border:2px solid var(--border);border-radius:8px;font-size:1rem;background-color:var(--background);color:var(--text)}
-    .btn{padding:12px 25px;border:none;border-radius:30px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s}
+    .btn{padding:12px 25px;border:none;border-radius:30px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s; pointer-events:auto; touch-action:manipulation;}
     .btn-primary{background-color:var(--primary);color:#fff}
     .btn-primary:hover{background-color:var(--secondary)}
     .btn-secondary{background-color:var(--background);color:var(--text);border:2px solid var(--border)}
@@ -106,7 +106,7 @@
       </aside>
 
       <main class="content">
-        <!-- HALAMAN HOME -->
+        <!-- HOME -->
         <div class="page active" id="home">
           <div class="login-form">
             <h2>Login Pemain</h2>
@@ -129,11 +129,11 @@
               </div>
             </div>
 
-            <button class="btn btn-primary btn-block" id="start-btn">Mulai Bermain</button>
+            <button class="btn btn-primary btn-block" id="start-btn" type="button">Mulai Bermain</button>
           </div>
         </div>
 
-        <!-- HALAMAN LEVEL -->
+        <!-- LEVELS -->
         <div class="page" id="levels">
           <div class="level-select">
             <h2>Pilih Level</h2>
@@ -141,7 +141,7 @@
           </div>
         </div>
 
-        <!-- HALAMAN GAME -->
+        <!-- GAME -->
         <div class="page" id="game">
           <div class="game-container">
             <div class="game-header">
@@ -151,33 +151,32 @@
 
             <div class="game-image"><img id="game-img" src="" alt="Gambar tebakan"></div>
 
-            <!-- Kontainer opsi / input -->
             <div class="game-options" id="options-container"></div>
 
             <div class="game-feedback" id="feedback"></div>
 
             <div class="game-controls">
-              <button class="btn btn-secondary" id="hint-btn">Bantuan</button>
-              <button class="btn btn-secondary" id="save-score-btn">Simpan Skor</button>
-              <button class="btn btn-primary" id="next-btn" style="display:none;">Lanjut</button>
+              <button class="btn btn-secondary" id="hint-btn" type="button">Bantuan</button>
+              <button class="btn btn-secondary" id="save-score-btn" type="button">Simpan Skor</button>
+              <button class="btn btn-primary" id="next-btn" type="button" style="display:none;">Lanjut</button>
             </div>
           </div>
         </div>
 
-        <!-- HALAMAN TOP SCORE -->
+        <!-- TOP SCORE -->
         <div class="page" id="top-score">
           <h2>Top Score</h2>
           <div id="scoreboard"></div>
         </div>
 
-        <!-- HALAMAN ADMIN -->
+        <!-- ADMIN -->
         <div class="page" id="admin">
           <h2>Panel Admin</h2>
           <div id="admin-locked" class="admin-box">
             <p>Masukkan password admin untuk mengelola soal.</p>
             <div class="admin-row">
               <input id="admin-pass" type="password" placeholder="Password admin">
-              <button class="btn btn-primary" id="admin-login-btn">Login</button>
+              <button class="btn btn-primary" id="admin-login-btn" type="button">Login</button>
             </div>
             <small>Hint: 6 digit 😊</small>
           </div>
@@ -215,13 +214,13 @@
             </div>
 
             <div class="admin-row">
-              <button class="btn btn-primary" id="adm-save">Simpan / Update Level</button>
-              <button class="btn btn-secondary" id="adm-delete">Hapus Custom Level</button>
+              <button class="btn btn-primary"  id="adm-save" type="button">Simpan / Update Level</button>
+              <button class="btn btn-secondary" id="adm-delete" type="button">Hapus Custom Level</button>
             </div>
 
             <div class="admin-row">
-              <button class="btn btn-secondary" id="adm-reset-score">Reset Semua Skor</button>
-              <button class="btn btn-secondary" id="adm-reset-progress">Reset Progress Pemain</button>
+              <button class="btn btn-secondary" id="adm-reset-score" type="button">Reset Semua Skor</button>
+              <button class="btn btn-secondary" id="adm-reset-progress" type="button">Reset Progress Pemain</button>
             </div>
 
             <div class="admin-list" id="adm-list"></div>
@@ -234,9 +233,7 @@
   </div>
 
   <script>
-    // --------------------------
-    // KONST & UTIL
-    // --------------------------
+    // ====== KONST & UTIL ======
     const LS_KEYS = {
       progress: 'tebakGambarProgress',
       scores: 'tebakGambarScores',
@@ -244,34 +241,45 @@
       admin: 'tebakGambarAdminAuthed'
     };
     const ADMIN_PASSWORD = '281105';
-    const GLOBAL_DEFAULT_MODE = 'easy'; // default global: easy (isian)
+    const GLOBAL_DEFAULT_MODE = 'easy';
 
-    function $(sel){ return document.querySelector(sel); }
-    function htmlescape(s){ return (s||'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    const $ = sel => document.querySelector(sel);
+    const htmlescape = s => (s||'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const norm = s => (s||'').toString().trim().toLowerCase();
 
-    // --------------------------
-    // DATA LEVEL DEFAULT (static/level)
-    // --------------------------
+    // Kompres image -> dataURL JPEG agar muat di localStorage
+    async function fileToDataURLCompressed(file, maxW=900, maxH=900, quality=0.8){
+      return new Promise((resolve, reject)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let w=img.width,h=img.height;
+          const r = Math.min(maxW/w, maxH/h, 1);
+          const cw=Math.round(w*r), ch=Math.round(h*r);
+          const cnv=document.createElement('canvas'); cnv.width=cw; cnv.height=ch;
+          cnv.getContext('2d').drawImage(img,0,0,cw,ch);
+          resolve(cnv.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        const fr = new FileReader();
+        fr.onload = e => img.src = e.target.result;
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    // ====== DATA LEVEL DEFAULT ======
     let gameData = [];
     for(let i=1;i<=100;i++){
       gameData.push({
-        level: i,
-        image: `static/level/level${i}.png`,
-        correctAnswer: `Jawaban Level ${i}`,
-        options: [
-          `Jawaban Level ${i}`,
-          `Opsi Salah A ${i}`,
-          `Opsi Salah B ${i}`,
-          `Opsi Salah C ${i}`
-        ],
+        level:i,
+        image:`static/level/level${i}.png`,
+        correctAnswer:`Jawaban Level ${i}`,
+        options:[`Jawaban Level ${i}`,`Opsi Salah A ${i}`,`Opsi Salah B ${i}`,`Opsi Salah C ${i}`],
         mode: GLOBAL_DEFAULT_MODE
       });
     }
 
-    // --------------------------
-    // THEME
-    // --------------------------
+    // ====== THEME ======
     const themes = {
       light1:{primary:"#3498db",secondary:"#2ecc71",accent:"#e74c3c",text:"#2c3e50",background:"#f8f9fa",cardBg:"#ffffff",border:"#ddd"},
       light2:{primary:"#9b59b6",secondary:"#1abc9c",accent:"#e67e22",text:"#34495e",background:"#ecf0f1",cardBg:"#ffffff",border:"#bdc3c7"},
@@ -283,393 +291,291 @@
       dark4:{primary:"#2c3e50",secondary:"#1abc9c",accent:"#e74c3c",text:"#ecf0f1",background:"#0c2461",cardBg:"#1e3799",border:"#4a69bd"}
     };
 
-    // --------------------------
-    // STATE
-    // --------------------------
-    let currentLevel = 1, score = 0, maxUnlockedLevel = 1;
-    let playerName = "Guest", playerAvatar = "domba", currentTheme = "light1";
+    // ====== STATE ======
+    let currentLevel=1, score=0, maxUnlockedLevel=1;
+    let playerName="Guest", playerAvatar="domba", currentTheme="light1";
 
     // DOM refs
-    const usernameEl = $('#username');
-    const userScoreEl = $('#user-score');
-    const userAvatarEl = $('#user-avatar');
-    const playerNameInput = $('#player-name');
-    const startBtn = $('#start-btn');
-    const levelsGrid = $('#levels-grid');
-    const currentLevelEl = $('#current-level');
-    const currentScoreEl = $('#current-score');
-    const gameImg = $('#game-img');
-    const optionsContainer = $('#options-container');
-    const feedbackEl = $('#feedback');
-    const nextBtn = $('#next-btn');
-    const hintBtn = $('#hint-btn');
-    const saveScoreBtn = $('#save-score-btn');
-    const logoutBtn = $('#logout-btn');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const pages = document.querySelectorAll('.page');
-    const themeBtns = document.querySelectorAll('.theme-btn');
-    const avatarOptions = document.querySelectorAll('.avatar-option');
+    const usernameEl=$('#username'), userScoreEl=$('#user-score'), userAvatarEl=$('#user-avatar');
+    const playerNameInput=$('#player-name'), startBtn=$('#start-btn');
+    const levelsGrid=$('#levels-grid'), currentLevelEl=$('#current-level'), currentScoreEl=$('#current-score');
+    const gameImg=$('#game-img'), optionsContainer=$('#options-container'), feedbackEl=$('#feedback');
+    const nextBtn=$('#next-btn'), hintBtn=$('#hint-btn'), saveScoreBtn=$('#save-score-btn'), logoutBtn=$('#logout-btn');
+    const navLinks=document.querySelectorAll('.nav-link'), pages=document.querySelectorAll('.page');
+    const themeBtns=document.querySelectorAll('.theme-btn'), avatarOptions=document.querySelectorAll('.avatar-option');
 
     // Admin DOM
-    const adminLocked = $('#admin-locked');
-    const adminPanel = $('#admin-panel');
-    const adminLoginBtn = $('#admin-login-btn');
-    const adminPass = $('#admin-pass');
-    const admLevel = $('#adm-level');
-    const admMode = $('#adm-mode');
-    const admImage = $('#adm-image');
-    const admPreview = $('#adm-preview');
-    const admCorrect = $('#adm-correct');
-    const admWA = $('#adm-wa');
-    const admWB = $('#adm-wb');
-    const admWC = $('#adm-wc');
-    const admSave = $('#adm-save');
-    const admDelete = $('#adm-delete');
-    const admResetScore = $('#adm-reset-score');
-    const admResetProgress = $('#adm-reset-progress');
-    const admList = $('#adm-list');
-    const admMCQWrap = $('#adm-mcq');
+    const adminLocked=$('#admin-locked'), adminPanel=$('#admin-panel');
+    const adminLoginBtn=$('#admin-login-btn'), adminPass=$('#admin-pass');
+    const admLevel=$('#adm-level'), admMode=$('#adm-mode'), admImage=$('#adm-image'), admPreview=$('#adm-preview');
+    const admCorrect=$('#adm-correct'), admWA=$('#adm-wa'), admWB=$('#adm-wb'), admWC=$('#adm-wc');
+    const admSave=$('#adm-save'), admDelete=$('#adm-delete'), admResetScore=$('#adm-reset-score'), admResetProgress=$('#adm-reset-progress');
+    const admList=$('#adm-list'), admMCQWrap=$('#adm-mcq');
 
-    // --------------------------
-    // INIT
-    // --------------------------
-    document.addEventListener('DOMContentLoaded', () => {
+    // ====== INIT ======
+    document.addEventListener('DOMContentLoaded', ()=>{
       loadCustomLevels();
       generateLevelButtons();
       loadGameProgress();
       updateUI();
       renderScoreboard();
       updateAdminGate();
+      admMCQWrap.style.display = (admMode.value==='mcq') ? 'grid' : 'none';
     });
 
-    // --------------------------
-    // LEVEL BUTTONS
-    // --------------------------
+    // ====== LEVEL BUTTONS ======
     function generateLevelButtons(){
-      levelsGrid.innerHTML = '';
+      levelsGrid.innerHTML='';
       for(let i=1;i<=100;i++){
-        const b = document.createElement('button');
-        b.className = 'level-btn';
-        b.textContent = i;
-        b.dataset.level = i;
-
-        if(i === currentLevel) b.classList.add('current');
-        else if(i < currentLevel) b.classList.add('completed');
-        else if(i === maxUnlockedLevel) b.classList.add('unlocked');
-
-        if(i <= maxUnlockedLevel){
-          b.addEventListener('click',()=>selectLevel(i));
-        }
+        const b=document.createElement('button');
+        b.className='level-btn'; b.textContent=i; b.dataset.level=i;
+        if(i===currentLevel) b.classList.add('current');
+        else if(i<currentLevel) b.classList.add('completed');
+        else if(i===maxUnlockedLevel) b.classList.add('unlocked');
+        if(i<=maxUnlockedLevel) b.addEventListener('click',()=>selectLevel(i));
         levelsGrid.appendChild(b);
       }
     }
-    function selectLevel(level){ currentLevel = level; showPage('game'); loadLevel(level); }
+    function selectLevel(l){ currentLevel=l; showPage('game'); loadLevel(l); }
 
-    // --------------------------
-    // LOAD LEVEL
-    // --------------------------
-    function getLevelData(level){
-      return gameData[level-1];
-    }
-    function loadLevel(level){
-      const d = getLevelData(level);
-      currentLevelEl.textContent = level;
-      currentScoreEl.textContent = score;
+    // ====== LOAD LEVEL ======
+    const getLevelData = l => gameData[l-1];
+    function loadLevel(l){
+      const d=getLevelData(l);
+      currentLevelEl.textContent=l; currentScoreEl.textContent=score;
 
-      // gambar: pakai custom->dataURL jika ada; else pakai static/level/levelN.png; fallback placeholder
       const fromCustom = (d.customImage && d.customImage.startsWith('data:'));
-      gameImg.onerror = () => {
-        gameImg.onerror = null;
-        gameImg.src = `https://via.placeholder.com/500x300/3498db/ffffff?text=Level+${level}`;
-      };
-      gameImg.src = (fromCustom ? d.customImage : (d.image + `?v=${Date.now()}`));
-      gameImg.alt = `Gambar untuk level ${level}`;
+      gameImg.onerror = ()=>{ gameImg.onerror=null; gameImg.src=`https://via.placeholder.com/500x300/3498db/ffffff?text=Level+${l}`; };
+      gameImg.src = fromCustom ? d.customImage : (d.image + `?v=${Date.now()}`);
+      gameImg.alt = `Gambar untuk level ${l}`;
 
-      // render soal: easy (isian) atau mcq (pilihan ganda)
-      optionsContainer.innerHTML = '';
-      if ((d.mode || GLOBAL_DEFAULT_MODE) === 'easy') {
-        renderEasy(d);
-      } else {
-        renderMCQ(d);
-      }
+      optionsContainer.innerHTML='';
+      if((d.mode||GLOBAL_DEFAULT_MODE)==='easy') renderEasy(d); else renderMCQ(d);
 
-      feedbackEl.textContent = '';
-      feedbackEl.className = 'game-feedback';
-      nextBtn.style.display = 'none';
+      feedbackEl.textContent=''; feedbackEl.className='game-feedback'; nextBtn.style.display='none';
     }
 
     function renderMCQ(d){
-      const shuffled = [...d.options];
-      shuffled.sort(()=>Math.random()-0.5);
       optionsContainer.classList.add('game-options');
-      optionsContainer.innerHTML = '';
-      shuffled.forEach(opt=>{
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = opt;
-        btn.onclick = ()=>checkAnswer(opt, d.correctAnswer);
+      const opts=[...d.options]; opts.sort(()=>Math.random()-0.5);
+      opts.forEach(o=>{
+        const btn=document.createElement('button');
+        btn.className='option-btn'; btn.textContent=o;
+        btn.onclick=()=>checkAnswer(o,d.correctAnswer);
         optionsContainer.appendChild(btn);
       });
     }
-
     function renderEasy(d){
       optionsContainer.classList.remove('game-options');
-      optionsContainer.innerHTML = `
+      optionsContainer.innerHTML=`
         <div style="display:grid;gap:12px;max-width:520px;margin:0 auto;">
           <input id="easy-input" type="text" placeholder="Ketik jawaban kamu…" 
-                 style="padding:12px 15px;border:2px solid var(--border);border-radius:10px;background:var(--background);color:var(--text);font-size:1rem;">
-          <button id="easy-submit" class="btn btn-primary">Cek Jawaban</button>
+            style="padding:12px 15px;border:2px solid var(--border);border-radius:10px;background:var(--background);color:var(--text);font-size:1rem;">
+          <button id="easy-submit" class="btn btn-primary" type="button">Cek Jawaban</button>
         </div>`;
-      const input = $('#easy-input'); const submit = $('#easy-submit');
-      const go = ()=>checkTextAnswer(input.value, d.correctAnswer);
-      submit.onclick = go; input.onkeydown = e=>{if(e.key==='Enter') go();};
+      const input=$('#easy-input'), submit=$('#easy-submit');
+      const go=()=>checkTextAnswer(input.value,d.correctAnswer);
+      submit.onclick=go; input.onkeydown=e=>{ if(e.key==='Enter') go(); };
     }
 
-    function checkAnswer(selected, correct){
+    function checkAnswer(sel, correct){
       document.querySelectorAll('.option-btn').forEach(b=>{
-        b.disabled = true;
-        if(b.textContent === correct) b.classList.add('correct');
-        else if(b.textContent === selected && selected !== correct) b.classList.add('incorrect');
+        b.disabled=true;
+        if(b.textContent===correct) b.classList.add('correct');
+        else if(b.textContent===sel && sel!==correct) b.classList.add('incorrect');
       });
-      postAnswer(selected === correct, correct);
+      postAnswer(sel===correct, correct);
     }
-
-    function checkTextAnswer(text, correct){
-      postAnswer(norm(text) === norm(correct), correct);
-    }
-
+    function checkTextAnswer(txt, correct){ postAnswer(norm(txt)===norm(correct), correct); }
     function postAnswer(ok, correct){
       if(ok){
-        feedbackEl.textContent = "Benar! 🎉";
-        feedbackEl.classList.remove('incorrect-feedback');
-        feedbackEl.classList.add('correct-feedback');
-        score += 10;
-        userScoreEl.textContent = score;
-        currentScoreEl.textContent = score;
-        if(currentLevel === maxUnlockedLevel){ maxUnlockedLevel = Math.min(maxUnlockedLevel+1, 100); }
+        feedbackEl.textContent="Benar! 🎉";
+        feedbackEl.classList.remove('incorrect-feedback'); feedbackEl.classList.add('correct-feedback');
+        score+=10; userScoreEl.textContent=score; currentScoreEl.textContent=score;
+        if(currentLevel===maxUnlockedLevel) maxUnlockedLevel=Math.min(maxUnlockedLevel+1,100);
         saveGameProgress();
       }else{
-        feedbackEl.textContent = `Salah! Jawaban yang benar: ${correct}`;
-        feedbackEl.classList.remove('correct-feedback');
-        feedbackEl.classList.add('incorrect-feedback');
+        feedbackEl.textContent=`Salah! Jawaban yang benar: ${correct}`;
+        feedbackEl.classList.remove('correct-feedback'); feedbackEl.classList.add('incorrect-feedback');
       }
-      nextBtn.style.display = 'block';
+      nextBtn.style.display='block';
     }
 
-    // --------------------------
-    // SCOREBOARD
-    // --------------------------
-    function getScores(){
-      try{ return JSON.parse(localStorage.getItem(LS_KEYS.scores) || '[]'); }catch{ return []; }
-    }
-    function setScores(arr){ localStorage.setItem(LS_KEYS.scores, JSON.stringify(arr)); }
-    function addScore(name, score, avatar){
-      const scores = getScores();
-      scores.push({name, score, avatar, date: new Date().toISOString()});
-      scores.sort((a,b)=> b.score - a.score);
-      setScores(scores.slice(0,50)); // simpan top 50
-      renderScoreboard();
+    // ====== SCOREBOARD ======
+    const getScores=()=>{ try{return JSON.parse(localStorage.getItem(LS_KEYS.scores)||'[]')}catch{return[]} };
+    const setScores=a=>localStorage.setItem(LS_KEYS.scores, JSON.stringify(a));
+    function addScore(name,score,avatar){
+      const s=getScores(); s.push({name,score,avatar,date:new Date().toISOString()});
+      s.sort((a,b)=>b.score-a.score); setScores(s.slice(0,50)); renderScoreboard();
     }
     function renderScoreboard(){
-      const scores = getScores();
-      const el = $('#scoreboard');
-      if(!scores.length){ el.innerHTML = '<p>Belum ada skor tersimpan.</p>'; return; }
-      const rows = scores.map((s,idx)=>`
-        <tr>
-          <td>${idx+1}</td>
-          <td><img src="static/avatar/${htmlescape(s.avatar||'domba')}.jpg" onerror="this.src='static/avatar/${htmlescape(s.avatar||'domba')}.png'" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px"> ${htmlescape(s.name)}</td>
-          <td>${s.score}</td>
-          <td>${new Date(s.date).toLocaleString()}</td>
-        </tr>`).join('');
-      el.innerHTML = `<table><thead><tr><th>#</th><th>Pemain</th><th>Skor</th><th>Waktu</th></tr></thead><tbody>${rows}</tbody></table>`;
+      const s=getScores(), el=$('#scoreboard');
+      if(!s.length){ el.innerHTML='<p>Belum ada skor tersimpan.</p>'; return; }
+      el.innerHTML=`<table><thead><tr><th>#</th><th>Pemain</th><th>Skor</th><th>Waktu</th></tr></thead><tbody>${
+        s.map((r,i)=>`<tr>
+          <td>${i+1}</td>
+          <td><img src="static/avatar/${htmlescape(r.avatar||'domba')}.jpg" onerror="this.src='static/avatar/${htmlescape(r.avatar||'domba')}.png'" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px"> ${htmlescape(r.name)}</td>
+          <td>${r.score}</td><td>${new Date(r.date).toLocaleString()}</td></tr>`).join('')
+      }</tbody></table>`;
     }
 
-    // --------------------------
-    // STORAGE (PROGRESS)
-    // --------------------------
+    // ====== STORAGE PROGRESS ======
     function saveGameProgress(){
-      const data = {playerName, playerAvatar, score, currentLevel, maxUnlockedLevel, currentTheme};
-      localStorage.setItem(LS_KEYS.progress, JSON.stringify(data));
+      localStorage.setItem(LS_KEYS.progress, JSON.stringify({playerName,playerAvatar,score,currentLevel,maxUnlockedLevel,currentTheme}));
     }
     function loadGameProgress(){
-      const saved = localStorage.getItem(LS_KEYS.progress);
-      if(!saved) return;
+      const s=localStorage.getItem(LS_KEYS.progress); if(!s) return;
       try{
-        const p = JSON.parse(saved);
-        playerName = p.playerName || playerName;
-        if(p.playerAvatar && /^avatar\d+$/i.test(p.playerAvatar)) playerAvatar = "domba";
-        else playerAvatar = p.playerAvatar || playerAvatar;
-        score = p.score ?? score;
-        currentLevel = p.currentLevel ?? currentLevel;
-        maxUnlockedLevel = p.maxUnlockedLevel ?? maxUnlockedLevel;
-        currentTheme = p.currentTheme || 'light1';
-        applyTheme(currentTheme);
-        themeBtns.forEach(btn=> btn.classList.toggle('active', btn.dataset.theme === currentTheme));
+        const p=JSON.parse(s);
+        playerName=p.playerName||playerName;
+        if(p.playerAvatar && /^avatar\d+$/i.test(p.playerAvatar)) playerAvatar="domba"; else playerAvatar=p.playerAvatar||playerAvatar;
+        score=p.score??score; currentLevel=p.currentLevel??currentLevel; maxUnlockedLevel=p.maxUnlockedLevel??maxUnlockedLevel;
+        currentTheme=p.currentTheme||'light1'; applyTheme(currentTheme);
+        themeBtns.forEach(b=>b.classList.toggle('active', b.dataset.theme===currentTheme));
       }catch{}
     }
 
-    // --------------------------
-    // CUSTOM LEVELS (ADMIN)
-    // --------------------------
+    // ====== CUSTOM LEVELS (ADMIN) ======
     function loadCustomLevels(){
       try{
-        const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+        const obj=JSON.parse(localStorage.getItem(LS_KEYS.custom)||'{}');
         Object.keys(obj).forEach(k=>{
-          const n = Number(k); if(!n || n<1 || n>100) return;
-          const d = gameData[n-1];
-          const c = obj[k];
-          d.customImage = c.image || null;
-          d.correctAnswer = c.correct || d.correctAnswer;
-          d.options = c.options && c.options.length === 4 ? c.options : d.options;
-          d.mode = c.mode || d.mode;
+          const n=Number(k); if(!n||n<1||n>100) return;
+          const d=gameData[n-1], c=obj[k];
+          d.customImage=c.image||null;
+          d.correctAnswer=c.correct||d.correctAnswer;
+          d.options=(c.options&&c.options.length===4)?c.options:d.options;
+          d.mode=c.mode||d.mode;
         });
       }catch{}
     }
-    function saveCustomLevel(n, payload){
-      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
-      obj[n] = payload;
-      localStorage.setItem(LS_KEYS.custom, JSON.stringify(obj));
-      loadCustomLevels();
-      renderAdminList();
+    function saveCustomLevel(n,payload){
+      const key=LS_KEYS.custom;
+      const obj=JSON.parse(localStorage.getItem(key)||'{}');
+      obj[n]=payload;
+      // bisa lempar error jika storage penuh
+      localStorage.setItem(key, JSON.stringify(obj));
+      loadCustomLevels(); renderAdminList();
     }
     function deleteCustomLevel(n){
-      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
+      const key=LS_KEYS.custom;
+      const obj=JSON.parse(localStorage.getItem(key)||'{}');
       delete obj[n];
-      localStorage.setItem(LS_KEYS.custom, JSON.stringify(obj));
-      loadCustomLevels();
-      renderAdminList();
+      localStorage.setItem(key, JSON.stringify(obj));
+      loadCustomLevels(); renderAdminList();
     }
     function renderAdminList(){
-      const obj = JSON.parse(localStorage.getItem(LS_KEYS.custom) || '{}');
-      const keys = Object.keys(obj).sort((a,b)=>Number(a)-Number(b));
-      if(!keys.length){ admList.innerHTML = '<p>Belum ada custom level.</p>'; return; }
-      admList.innerHTML = keys.map(k=>{
-        const c = obj[k];
+      const obj=JSON.parse(localStorage.getItem(LS_KEYS.custom)||'{}');
+      const keys=Object.keys(obj).sort((a,b)=>Number(a)-Number(b));
+      if(!keys.length){ $('#adm-list').innerHTML='<p>Belum ada custom level.</p>'; return; }
+      $('#adm-list').innerHTML = keys.map(k=>{
+        const c=obj[k];
         return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <img class="thumb" src="${c.image || ''}" alt="L${k}">
+          <img class="thumb" src="${c.image||''}" alt="L${k}">
           <div>
-            <div><b>Level ${k}</b> • Mode: ${c.mode || 'easy'}</div>
+            <div><b>Level ${k}</b> • Mode: ${c.mode||'easy'}</div>
             <div>Jawaban: ${htmlescape(c.correct||'')}</div>
             ${c.mode==='mcq' ? `<div>Opsi: ${c.options.map(htmlescape).join(' | ')}</div>` : ''}
-          </div>
-        </div>`;
+          </div></div>`;
       }).join('');
     }
 
-    // --------------------------
-    // UI
-    // --------------------------
+    // ====== UI ======
     function updateUI(){
-      usernameEl.textContent = playerName;
-      userScoreEl.textContent = score;
-      // avatar: coba jpg -> fallback png
-      userAvatarEl.onerror = ()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
-      userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
-      playerNameInput.value = playerName;
-      avatarOptions.forEach(a=> a.style.borderColor = (a.dataset.avatar === playerAvatar) ? '#3498db' : '#ddd' );
+      usernameEl.textContent=playerName; userScoreEl.textContent=score;
+      userAvatarEl.onerror=()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
+      userAvatarEl.src=`static/avatar/${playerAvatar}.jpg`;
+      playerNameInput.value=playerName;
+      avatarOptions.forEach(a=> a.style.borderColor=(a.dataset.avatar===playerAvatar)?'#3498db':'#ddd');
       generateLevelButtons();
     }
     function showPage(id){
-      pages.forEach(p=>p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      navLinks.forEach(l=> l.classList.toggle('active', l.dataset.page===id));
+      pages.forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active');
+      navLinks.forEach(l=>l.classList.toggle('active', l.dataset.page===id));
       if(id==='top-score') renderScoreboard();
       if(id==='admin') updateAdminGate();
     }
     function applyTheme(name){
-      const t = themes[name]; Object.entries(t).forEach(([k,v])=> document.documentElement.style.setProperty(`--${k}`, v));
+      Object.entries(themes[name]).forEach(([k,v])=> document.documentElement.style.setProperty(`--${k}`,v));
       if(name.startsWith('dark')) document.body.classList.add('dark-theme'); else document.body.classList.remove('dark-theme');
-      currentTheme = name; saveGameProgress();
+      currentTheme=name; saveGameProgress();
     }
     function updateAdminGate(){
       const authed = localStorage.getItem(LS_KEYS.admin)==='1';
       adminLocked.style.display = authed ? 'none' : 'block';
-      adminPanel.style.display = authed ? 'block' : 'none';
+      adminPanel.style.display  = authed ? 'block' : 'none';
       if(authed) renderAdminList();
     }
 
-    // --------------------------
-    // EVENTS
-    // --------------------------
-    startBtn.addEventListener('click',()=>{ playerName = playerNameInput.value.trim() || 'Player'; updateUI(); showPage('levels'); });
-    nextBtn.addEventListener('click',()=>{ if(currentLevel < 100) selectLevel(currentLevel+1); else showPage('levels'); });
-    hintBtn.addEventListener('click',()=>{
-      const d = getLevelData(currentLevel);
-      const hint = (d.correctAnswer||'').slice(0,1) + '…';
-      alert(`Hint: ${hint}`);
-    });
-    saveScoreBtn.addEventListener('click',()=>{ addScore(playerName, score, playerAvatar); alert('Skor disimpan! Cek halaman Top Score.'); });
-
+    // ====== EVENTS ======
+    startBtn.addEventListener('click',()=>{ playerName=playerNameInput.value.trim()||'Player'; updateUI(); showPage('levels'); });
+    nextBtn.addEventListener('click',()=>{ if(currentLevel<100) selectLevel(currentLevel+1); else showPage('levels'); });
+    hintBtn.addEventListener('click',()=>{ const d=getLevelData(currentLevel); alert('Hint: ' + (d.correctAnswer||'').slice(0,1) + '…'); });
+    saveScoreBtn.addEventListener('click',()=>{ addScore(playerName,score,playerAvatar); alert('Skor disimpan! Cek halaman Top Score.'); });
     logoutBtn.addEventListener('click',()=> showPage('home'));
-
-    navLinks.forEach(link=> link.addEventListener('click',e=>{ e.preventDefault(); showPage(link.dataset.page); }));
-
-    themeBtns.forEach(btn=> btn.addEventListener('click',()=>{
-      themeBtns.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); applyTheme(btn.dataset.theme);
-    }));
-
+    navLinks.forEach(l=> l.addEventListener('click',e=>{ e.preventDefault(); showPage(l.dataset.page);} ));
+    themeBtns.forEach(b=> b.addEventListener('click',()=>{ themeBtns.forEach(x=>x.classList.remove('active')); b.classList.add('active'); applyTheme(b.dataset.theme); }));
     avatarOptions.forEach(img=> img.addEventListener('click',()=>{
-      playerAvatar = img.dataset.avatar;
-      userAvatarEl.onerror = ()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
-      userAvatarEl.src = `static/avatar/${playerAvatar}.jpg`;
-      avatarOptions.forEach(a=> a.style.borderColor = (a===img) ? '#3498db' : '#ddd');
-      saveGameProgress();
+      playerAvatar=img.dataset.avatar;
+      userAvatarEl.onerror=()=>{ userAvatarEl.onerror=null; userAvatarEl.src=`static/avatar/${playerAvatar}.png`; };
+      userAvatarEl.src=`static/avatar/${playerAvatar}.jpg`;
+      avatarOptions.forEach(a=> a.style.borderColor=(a===img)?'#3498db':'#ddd'); saveGameProgress();
     }));
 
-    // Admin login
+    // Admin
     adminLoginBtn.addEventListener('click',()=>{
-      if(adminPass.value === ADMIN_PASSWORD){ localStorage.setItem(LS_KEYS.admin,'1'); adminPass.value=''; updateAdminGate(); }
+      if(adminPass.value===ADMIN_PASSWORD){ localStorage.setItem(LS_KEYS.admin,'1'); adminPass.value=''; updateAdminGate(); }
       else alert('Password salah.');
     });
-
-    // Admin mode switch -> tampil/ sembunyi opsi MCQ
     admMode.addEventListener('change',()=>{ admMCQWrap.style.display = (admMode.value==='mcq') ? 'grid' : 'none'; });
 
-    // Preview image saat upload
-    admImage.addEventListener('change',()=>{
-      const f = admImage.files && admImage.files[0];
-      if(!f) return; const r = new FileReader();
-      r.onload = e=> { admPreview.src = e.target.result; };
-      r.readAsDataURL(f);
+    // PREVIEW + KOMPRES
+    admImage.addEventListener('change', async ()=>{
+      const f = admImage.files && admImage.files[0]; if(!f) return;
+      try{
+        const dataUrl = await fileToDataURLCompressed(f, 900, 900, 0.8);
+        admPreview.src = dataUrl;
+        admPreview.dataset.dataurl = dataUrl; // simpan sementara untuk disave
+      }catch(e){ alert('Gagal memproses gambar: ' + (e.message||e)); }
     });
 
-    // Simpan/Update custom level
-    admSave.addEventListener('click',()=>{
+    // SIMPAN / UPDATE LEVEL
+    admSave.addEventListener('click', ()=>{
       const n = Math.max(1, Math.min(100, parseInt(admLevel.value||'1',10)));
-      const payload = {
-        mode: admMode.value || 'easy',
-        correct: admCorrect.value.trim()
-      };
+      const payload = { mode: admMode.value || 'easy', correct: (admCorrect.value||'').trim() };
+
       if(payload.mode==='mcq'){
-        const opts = [payload.correct, admWA.value.trim(), admWB.value.trim(), admWC.value.trim()].filter(Boolean);
-        while(opts.length < 4) opts.push('—');
+        const opts = [payload.correct, (admWA.value||'').trim(), (admWB.value||'').trim(), (admWC.value||'').trim()].filter(Boolean);
+        while(opts.length<4) opts.push('—');
         payload.options = opts.slice(0,4);
       }
-      if(admPreview.src && admPreview.src.startsWith('data:')) payload.image = admPreview.src;
+      if(admPreview.dataset && admPreview.dataset.dataurl){ payload.image = admPreview.dataset.dataurl; }
 
-      saveCustomLevel(n, payload);
+      try{
+        saveCustomLevel(n, payload);
 
-      // sinkron ke gameData sekarang juga
-      const d = gameData[n-1];
-      if(payload.image) d.customImage = payload.image;
-      if(payload.correct) d.correctAnswer = payload.correct;
-      if(payload.options) d.options = payload.options;
-      if(payload.mode) d.mode = payload.mode;
+        const d = gameData[n-1];
+        if(payload.image) d.customImage = payload.image;
+        if(payload.correct) d.correctAnswer = payload.correct;
+        if(payload.options) d.options = payload.options;
+        if(payload.mode) d.mode = payload.mode;
 
-      alert(`Level ${n} disimpan!`);
-      admPreview.src = ''; admImage.value=''; // clear preview
+        alert(`Level ${n} disimpan!`);
+        admPreview.src=''; delete admPreview.dataset.dataurl; admImage.value='';
+      }catch(e){
+        alert('Gagal menyimpan. Kemungkinan storage penuh. Coba unggah gambar lebih kecil / kompres.');
+      }
     });
 
-    // Hapus custom level
-    admDelete.addEventListener('click',()=>{
-      const n = Math.max(1, Math.min(100, parseInt(admLevel.value||'1',10)));
+    // HAPUS CUSTOM
+    admDelete.addEventListener('click', ()=>{
+      const n=Math.max(1,Math.min(100,parseInt(admLevel.value||'1',10)));
       deleteCustomLevel(n);
-      const d = gameData[n-1];
-      d.customImage = null; d.mode = GLOBAL_DEFAULT_MODE; // reset ke default
-      alert(`Custom Level ${n} dihapus (kembali ke file static).`);
+      const d=gameData[n-1]; d.customImage=null; d.mode=GLOBAL_DEFAULT_MODE;
+      alert(`Custom Level ${n} dihapus (kembali pakai file static).`);
     });
 
-    // Reset skor & progress
+    // RESET
     admResetScore.addEventListener('click',()=>{ if(confirm('Hapus semua skor?')){ localStorage.removeItem(LS_KEYS.scores); renderScoreboard(); alert('Skor di-reset.'); }});
     admResetProgress.addEventListener('click',()=>{ if(confirm('Hapus progress pemain?')){ localStorage.removeItem(LS_KEYS.progress); score=0; currentLevel=1; maxUnlockedLevel=1; updateUI(); alert('Progress di-reset.'); }});
   </script>
